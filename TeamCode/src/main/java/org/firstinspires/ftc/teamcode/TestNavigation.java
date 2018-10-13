@@ -36,7 +36,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.ConceptVuforiaNavigation;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -99,7 +98,7 @@ public class TestNavigation extends LinearOpMode {
 
         parameters.vuforiaLicenseKey = "AVsSQB3/////AAABGehU0OjxREoznvNKEBqbvmskci8syRYfMKE0XlaGnZpw68DAZV19s7dfqc0vWrY78bAO2Ym2n1T2rDvNBOVVbMWxXIRo2c18JH6/c2fcKT1bRKxsG7bYq69+n9IHmKedY6rmTU1VOZZdtSTXh7exMsl67IAcnCZ0/ec+P+ZMpkK5v4X8d27rbEigGqqHayGe1/lG2afzgcHY7QxjJ/x5O4yGmVVs8wdzdupke19U+M8Z/x0FcYIfTAHuXcaydEL+h/w/ppcuNarD2ggo2BxdWeOGLx5GOin1yruVfvDAazPEuI0m3yEwXQNZ4e0ar2G0jDCZpAJPJcJRRVttBMwPoAvzTwySUx3qI1eNSJRAH+bk";
 
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
 
         /**
@@ -120,16 +119,16 @@ public class TestNavigation extends LinearOpMode {
         //Position Variables
         //stones
         float stonesTransX = 0;
-        float stonesTransY = -1828;
-        float stonesTransZ = 146.05f;
+        float stonesTransY = 1828;
+        float stonesTransZ = 0;
 
         float stonesRotX = 90;
-        float stonesRotY = 180;
+        float stonesRotY = 0;
         float stonesRotZ = 0;
 
         //phones
-        float phoneTransX= 876.2f;
-        float phoneTransY = 152.4f;
+        float phoneTransX = 0;
+        float phoneTransY = 0;
         float phoneTransZ = 0;
 
         float phoneRotX = 90;
@@ -141,7 +140,7 @@ public class TestNavigation extends LinearOpMode {
         OpenGLMatrix stonesLoc = OpenGLMatrix
                 .translation(stonesTransX , stonesTransY, stonesTransZ)
                 .multiplied(Orientation.getRotationMatrix(
-                        AxesReference.INTRINSIC, AxesOrder.XYZ,
+                        AxesReference.EXTRINSIC, AxesOrder.XYZ,
                         AngleUnit.DEGREES, stonesRotX, stonesRotY, stonesRotZ));
 
         stones.setLocation(stonesLoc);
@@ -158,8 +157,8 @@ public class TestNavigation extends LinearOpMode {
         ((VuforiaTrackableDefaultListener)stones.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
 
 
-          telemetry.addData(">", "Press Play to start");
-           telemetry.update();
+        telemetry.addData(">", "Press Play to start");
+        telemetry.update();
         waitForStart();
 
         stonesAndChips.activate();
