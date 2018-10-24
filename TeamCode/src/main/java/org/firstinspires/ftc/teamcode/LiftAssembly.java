@@ -33,14 +33,14 @@ public class LiftAssembly extends Assembly {
     }
 
 
-    protected void lockRobot()
+    protected void lockRobot(double position)
     {
-
+        robotHardware.liftLock.setPosition(position);
     }
 
-    protected void unlockRobot()
+    protected void unlockRobot(double position)
     {
-
+        robotHardware.liftLock.setPosition(position);
     }
 
 }
