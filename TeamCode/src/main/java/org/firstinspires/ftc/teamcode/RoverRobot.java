@@ -69,6 +69,7 @@ public class RoverRobot {
         return chassisAssembly;
     }
 
+    public ArmAssembly  getArmAssembly()  {return armAssembly;}
 
     public Location getRobotLocation() {
         return robotLocation;

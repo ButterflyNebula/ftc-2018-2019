@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -23,6 +24,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 
 
 @TeleOp(name="DriverControlledMode", group ="Tests")
+
 public class DriverControlledMode extends LinearOpMode {
 
     private RoverRobot roverRuckusBot = new RoverRobot();
@@ -32,10 +34,12 @@ public class DriverControlledMode extends LinearOpMode {
     private static final double     LIFT_UP_SPEED     = 0.6;
     private static final double     LIFT_DOWN_SPEED   = 0.6;
     private static final float      mmPerInch         = 25.4f;
+    private static final double     SHOULDER_SPEED    = 1.0;
 
     @Override public void runOpMode() {
 
         roverRuckusBot.initRobot(hardwareMap);
+        boolean isLocked = true;
         waitForStart();
         telemetry.addData("Press Play to Start", "");
         telemetry.update();
@@ -95,9 +99,6 @@ public class DriverControlledMode extends LinearOpMode {
                 roverRuckusBot.getLiftAssembly().resetLift();
             }
 
-            if (gamepad1.a == true) {
-                roverRuckusBot.getLiftAssembly().resetLift();
-            }
 
             //forwards
             if (gamepad1.left_stick_y > 0) {
@@ -125,10 +126,41 @@ public class DriverControlledMode extends LinearOpMode {
             } else {
                 roverRuckusBot.getChassisAssembly().stopMoving();
             }
-            if (gamepad1.b == true) {
-                roverRuckusBot.getChassisAssembly().stopMoving();
+
+            double power = 0.7;
+            //intake wheels
+            if (gamepad1.x == true)
+            {
+                while (power < 1)
+                {
+                    roverRuckusBot.getArmAssembly().Intake(-power);
+                    power = power + 0.1;
+                }
+                while (power > 0.6) {
+                    roverRuckusBot.getArmAssembly().Intake(-power);
+                    power = power - 0.1;
+                }
+                power = 0.6;
+
+            }
+            else
+            {
+                roverRuckusBot.getArmAssembly().Intake(0);
             }
 
+         //   if (gamepad1.y == true)
+           // {
+             //   roverRuckusBot.getArmAssembly().OpenArm(0.7,0.5 );
+            //}
+
+            if (gamepad1.y == true) {
+                roverRuckusBot.getLiftAssembly().unlockRobot(0);
+
+            }
+            if (gamepad1.a== true) {
+                roverRuckusBot.getLiftAssembly().lockRobot(0.5);
+
+            }
         }
     }
 }
