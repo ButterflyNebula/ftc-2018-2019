@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 /**
  * Created by Athira on 10/14/2018.
  */
@@ -7,6 +9,12 @@ package org.firstinspires.ftc.teamcode;
 public class ArmAssembly{
 
     RobotHardware robotHardware;
+
+    protected ArmAssembly(RobotHardware hardware)
+    {
+        robotHardware = hardware;
+    }
+
 
     protected void Intake(double power)
     {
