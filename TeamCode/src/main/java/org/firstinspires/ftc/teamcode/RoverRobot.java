@@ -34,12 +34,12 @@ public class RoverRobot {
     {
         this.hardwareMap = hwMap;
         robotHardware = new RobotHardware(hwMap);
-        buildChassis();
+        buildChassisAssembly();
         buildLiftAssembly();
         buildArmAssembly();
     }
 
-    public void buildChassis () {
+    public void buildChassisAssembly () {
         this.chassisAssembly = new ChassisAssembly(robotHardware);
 
     }
