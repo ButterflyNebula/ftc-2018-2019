@@ -56,6 +56,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 @TeleOp(name="Test: Rover Navigation", group ="Test")
 public class RoverRuckusTestNavigation extends LinearOpMode {
 
+    //Getting a rover robot
+    RoverRobot robot = new RoverRobot();
 
     //Vuforia Setup
     private static final String VUFORIA_KEY = "AVsSQB3/////AAABGehU0OjxREoznvNKEBqbvmskci8syRYfMKE0XlaGnZpw68DAZV19s7dfqc0vWrY78bAO2Ym2n1T2rDvNBOVVbMWxXIRo2c18JH6/c2fcKT1bRKxsG7bYq69+n9IHmKedY6rmTU1VOZZdtSTXh7exMsl67IAcnCZ0/ec+P+ZMpkK5v4X8d27rbEigGqqHayGe1/lG2afzgcHY7QxjJ/x5O4yGmVVs8wdzdupke19U+M8Z/x0FcYIfTAHuXcaydEL+h/w/ppcuNarD2ggo2BxdWeOGLx5GOin1yruVfvDAazPEuI0m3yEwXQNZ4e0ar2G0jDCZpAJPJcJRRVttBMwPoAvzTwySUx3qI1eNSJRAH+bk";
@@ -75,6 +77,8 @@ public class RoverRuckusTestNavigation extends LinearOpMode {
     @Override
     public void runOpMode()
     {
+
+        robot.initRobot(hardwareMap);
 
         //Vuforia Setyp
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -142,6 +146,15 @@ public class RoverRuckusTestNavigation extends LinearOpMode {
             ((VuforiaTrackableDefaultListener)trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
         }
 
+
+        //Location of Field Objects
+        OpenGLMatrix blueDepotLocation = OpenGLMatrix
+                .translation(-mmFTCFieldWidth,mmFTCFieldWidth , 0)
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES,
+                        0 , 0,  0));
+        double depotSize = 24 * mmPerInch;
+
+
         //Wait for Start
         telemetry.addData(">", "Press Play to begin");
         telemetry.update();
@@ -169,14 +182,32 @@ public class RoverRuckusTestNavigation extends LinearOpMode {
 
             if (targetVisible)
             {
-                //Get the Translational Infomration in Inches
+                //Get the Translational Information in Inches
                 VectorF translation = lastLocation.getTranslation();
                 telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                         translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
 
-                //Getthe Rotational Information in Degrees
+                //Get the Rotational Information in Degrees
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+
+
+                //Trying to park in the depot (testing)
+                if(lastLocation.getTranslation().get(0) > blueDepotLocation.getTranslation().get(0) + depotSize)//getting the x position
+                {
+                    //that is it is too far to the right
+                    robot.getChassisAssembly().moveBackwards(0.3);
+                    telemetry.addData("moving left", 0.3);
+                    telemetry.update();
+                }
+                else if(gamepad1.a == true)
+                {
+                    robot.getChassisAssembly().stopMoving();
+                }
+                else
+                {
+                    robot.getChassisAssembly().stopMoving();
+                }
             }
             else
             {
@@ -186,3 +217,4 @@ public class RoverRuckusTestNavigation extends LinearOpMode {
         }
     }
 }
+
