@@ -23,7 +23,6 @@ import java.util.List;
 
 public class RoverRobot {
 
-    private HardwareMap hardwareMap = null;
     private static RobotHardware robotHardware = null;
     private LiftAssembly liftAssembly = null;
     private ChassisAssembly chassisAssembly = null;
@@ -32,7 +31,6 @@ public class RoverRobot {
 
     public void initRobot (HardwareMap hwMap)
     {
-        this.hardwareMap = hwMap;
         robotHardware = new RobotHardware(hwMap);
         buildChassisAssembly();
         buildLiftAssembly();
