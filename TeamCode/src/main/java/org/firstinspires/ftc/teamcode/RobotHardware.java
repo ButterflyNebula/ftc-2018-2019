@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 
 public class RobotHardware
@@ -24,10 +25,12 @@ public class RobotHardware
     public Servo   phoneSwivel = null;
     public CRServo leftIntake = null;
     public CRServo rightIntake = null;
-   // public DcMotor shoulder = null;
-   // public Servo   elbow = null;
-   // public Servo   wrist = null;
+    public DcMotor shoulder = null;
+    public Servo   elbow = null;
+    public Servo   wrist = null;
     public Servo   liftLock = null;
+    public DigitalChannel bottomTouch = null;
+    public DigitalChannel topTouch = null;
 
     //Adding the Hardware Map
     private HardwareMap hwMap  = null;
@@ -52,6 +55,11 @@ public class RobotHardware
         lift.setDirection(DcMotor.Direction.FORWARD);
         liftLock = hwMap.get(Servo.class, "liftLock");
 
+        //Initializing Touch Sensors
+        bottomTouch = hwMap.get(DigitalChannel.class, "bottomTouch");
+        topTouch = hwMap.get(DigitalChannel.class, "topTouch");
+
+
         //Initialize the intake motor
         leftIntake = hwMap.get(CRServo.class, "leftIntake");
         rightIntake = hwMap.get(CRServo.class, "rightIntake");
@@ -59,9 +67,9 @@ public class RobotHardware
         rightIntake.setDirection(CRServo.Direction.REVERSE);
 
         //Initializing the Arm motors
-       // shoulder = hwMap.get(DcMotor.class, "shoulder");
-       // elbow  = hwMap.get(Servo.class, "elbow");
-       // wrist = hwMap.get(Servo.class, "wrist");
+        shoulder = hwMap.get(DcMotor.class, "shoulder");
+        elbow  = hwMap.get(Servo.class, "elbow");
+        wrist = hwMap.get(Servo.class, "wrist");
 
     }
 
