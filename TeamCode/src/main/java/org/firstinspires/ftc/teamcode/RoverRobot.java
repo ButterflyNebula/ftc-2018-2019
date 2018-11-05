@@ -23,25 +23,21 @@ import java.util.List;
 
 public class RoverRobot {
 
-    private HardwareMap hardwareMap = null;
     private static RobotHardware robotHardware = null;
     private LiftAssembly liftAssembly = null;
     private ChassisAssembly chassisAssembly = null;
     private ArmAssembly armAssembly = null;
-    private Location robotLocation = null;
 
 
     public void initRobot (HardwareMap hwMap)
     {
-        this.hardwareMap = hwMap;
         robotHardware = new RobotHardware(hwMap);
-        buildChassis();
+        buildChassisAssembly();
         buildLiftAssembly();
         buildArmAssembly();
-        setTargets();
     }
 
-    public void buildChassis () {
+    public void buildChassisAssembly () {
         this.chassisAssembly = new ChassisAssembly(robotHardware);
 
     }
@@ -51,13 +47,6 @@ public class RoverRobot {
     }
     public void buildArmAssembly () {
         this.armAssembly = new ArmAssembly(robotHardware);
-
-    }
-
-
-    public void setTargets () {
-        this.robotLocation = new Location(robotHardware) ;
-        robotLocation.initializeNavigation();
 
     }
 
@@ -71,7 +60,4 @@ public class RoverRobot {
 
     public ArmAssembly  getArmAssembly()  {return armAssembly;}
 
-    public Location getRobotLocation() {
-        return robotLocation;
-    }
 }

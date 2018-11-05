@@ -7,12 +7,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * Created by Athira on 10/14/2018.
  */
 
-public class LiftAssembly extends Assembly {
+public class LiftAssembly{
+
+    RobotHardware robotHardware;
 
 
     protected LiftAssembly(RobotHardware hardware)
     {
-        super(hardware);
+        robotHardware = hardware;
 
     }
 

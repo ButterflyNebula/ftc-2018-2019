@@ -4,13 +4,14 @@ package org.firstinspires.ftc.teamcode;
  * Created by Athira on 10/14/2018.
  */
 
-public class ChassisAssembly extends Assembly {
+public class ChassisAssembly{
 
     double driveSpeed = 0.3;
+    RobotHardware robotHardware;
 
     protected ChassisAssembly(RobotHardware hardware)
     {
-        super(hardware);
+        robotHardware = hardware;
     }
 
   
@@ -28,10 +29,10 @@ public class ChassisAssembly extends Assembly {
      */
     protected void moveForward(double  speed)
     {
-        robotHardware.frontLeftWheel.setPower(speed);
-        robotHardware.frontRightWheel.setPower(speed);
-        robotHardware.backLeftWheel.setPower(speed);
-        robotHardware.backRightWheel.setPower(speed);
+        robotHardware.frontLeftWheel.setPower(-speed);
+        robotHardware.frontRightWheel.setPower(-speed);
+        robotHardware.backLeftWheel.setPower(-speed);
+        robotHardware.backRightWheel.setPower(-speed);
     }
 
     /**
@@ -40,10 +41,10 @@ public class ChassisAssembly extends Assembly {
      */
     protected void moveBackwards(double speed)
     {
-        robotHardware.frontLeftWheel.setPower(-speed);
-        robotHardware.frontRightWheel.setPower(-speed);
-        robotHardware.backLeftWheel.setPower(-speed);
-        robotHardware.backRightWheel.setPower(-speed);
+        robotHardware.frontLeftWheel.setPower(speed);
+        robotHardware.frontRightWheel.setPower(speed);
+        robotHardware.backLeftWheel.setPower(speed);
+        robotHardware.backRightWheel.setPower(speed);
     }
 
     /**
@@ -77,12 +78,12 @@ public class ChassisAssembly extends Assembly {
      * are given negative power and the front right wheel and back left wheel are given power.
      * @param speed at which the wheel motors will turn
      */
-    protected void sideWaysRight (double speed)
+    protected void moveRight (double speed)
     {
-        robotHardware.frontLeftWheel.setPower(speed);
-        robotHardware.backLeftWheel.setPower(-speed);
-        robotHardware.frontRightWheel.setPower(-speed);
-        robotHardware.backRightWheel.setPower(speed);
+        robotHardware.frontLeftWheel.setPower(-speed);
+        robotHardware.backLeftWheel.setPower(speed);
+        robotHardware.frontRightWheel.setPower(speed);
+        robotHardware.backRightWheel.setPower(-speed);
     }
 
     /**
@@ -90,12 +91,12 @@ public class ChassisAssembly extends Assembly {
      * are given negative power and the front left wheel and back right wheel are given power.
      * @param speed at which the wheel motors will turn
      */
-    protected void sideWaysLeft (double speed)
+    protected void moveLeft (double speed)
     {
-        robotHardware.frontLeftWheel.setPower(-speed);
-        robotHardware.backLeftWheel.setPower(speed);
-        robotHardware.frontRightWheel.setPower(speed);
-        robotHardware.backRightWheel.setPower(-speed);
+        robotHardware.frontLeftWheel.setPower(speed);
+        robotHardware.backLeftWheel.setPower(-speed);
+        robotHardware.frontRightWheel.setPower(-speed);
+        robotHardware.backRightWheel.setPower(speed);
     }
 
     /**
