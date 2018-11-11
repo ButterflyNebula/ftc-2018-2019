@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class LiftAssembly{
 
     RobotHardware robotHardware;
+    double lockPosition = 0.5;
+    double unlockPosition = 0.7;
 
 
     protected LiftAssembly(RobotHardware hardware)
@@ -35,14 +37,14 @@ public class LiftAssembly{
     }
 
 
-    protected void lockRobot(double position)
+    protected void lockRobot()
     {
-        robotHardware.liftLock.setPosition(position);
+        robotHardware.liftLock.setPosition(lockPosition);
     }
 
-    protected void unlockRobot(double position)
+    protected void unlockRobot()
     {
-        robotHardware.liftLock.setPosition(position);
+        robotHardware.liftLock.setPosition(unlockPosition);
     }
 
 }

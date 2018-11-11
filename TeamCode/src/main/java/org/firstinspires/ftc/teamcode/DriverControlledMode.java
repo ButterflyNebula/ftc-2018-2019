@@ -114,11 +114,11 @@ public class DriverControlledMode extends LinearOpMode {
 
 
             if (gamepad1.y == true) {
-                roverRuckusBot.getLiftAssembly().unlockRobot(0.7);
+                roverRuckusBot.getLiftAssembly().unlockRobot();
 
             }
             if (gamepad1.a== true) {
-                roverRuckusBot.getLiftAssembly().lockRobot(0.5);
+                roverRuckusBot.getLiftAssembly().lockRobot();
 
             }
         }
