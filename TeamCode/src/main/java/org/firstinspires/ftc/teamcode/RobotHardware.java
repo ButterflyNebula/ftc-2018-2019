@@ -22,15 +22,20 @@ public class RobotHardware
     public DcMotor backLeftWheel = null;
     public DcMotor backRightWheel = null;
     public DcMotor lift = null;
+    public DcMotor mineralLift = null;
     public Servo   phoneSwivel = null;
     public CRServo leftIntake = null;
     public CRServo rightIntake = null;
-    public DcMotor shoulder = null;
-    public Servo   elbow = null;
-    public Servo   wrist = null;
+    public DcMotor mineralArm = null;
+    public Servo   leftSortServo = null;
+    public Servo   rightSortServo = null;
     public Servo   liftLock = null;
+    public Servo   goldBasket = null;
+    public Servo silverBasket = null;
     public DigitalChannel bottomTouch = null;
     public DigitalChannel topTouch = null;
+    public DigitalChannel backTouch = null;
+    public DigitalChannel frontTouch = null;
 
     //Adding the Hardware Map
     private HardwareMap hwMap  = null;
@@ -55,10 +60,16 @@ public class RobotHardware
         lift.setDirection(DcMotor.Direction.FORWARD);
         liftLock = hwMap.get(Servo.class, "liftLock");
 
+        //Initialize the mineral lift motor and basket servos
+        mineralLift = hwMap.get(DcMotor.class, "mineralLift");
+        goldBasket = hwMap.get(Servo.class, "goldBasket");
+        silverBasket = hwMap.get(Servo.class, "silverBasket");
+
         //Initializing Touch Sensors
         bottomTouch = hwMap.get(DigitalChannel.class, "bottomTouch");
         topTouch = hwMap.get(DigitalChannel.class, "topTouch");
-
+        backTouch = hwMap.get(DigitalChannel.class, "backTouch");
+        frontTouch = hwMap.get(DigitalChannel.class, "frontTouch");
 
         //Initialize the intake motor
         leftIntake = hwMap.get(CRServo.class, "leftIntake");
@@ -67,10 +78,9 @@ public class RobotHardware
         rightIntake.setDirection(CRServo.Direction.REVERSE);
 
         //Initializing the Arm motors
-        shoulder = hwMap.get(DcMotor.class, "shoulder");
-        elbow  = hwMap.get(Servo.class, "elbow");
-        wrist = hwMap.get(Servo.class, "wrist");
-
+        mineralArm = hwMap.get(DcMotor.class, "mineralArm");
+        leftSortServo = hwMap.get(Servo.class, "leftSortServo");
+        rightSortServo = hwMap.get(Servo.class, "rightSortServo");
     }
 
     public HardwareMap getHwMap() {
