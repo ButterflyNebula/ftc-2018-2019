@@ -161,19 +161,15 @@ public class RoverRuckusTestNavigation extends LinearOpMode {
         waitForStart();
 
         targetsRoverRuckus.activate();
-        while (opModeIsActive())
+        while (opModeIsActive() && targetVisible==false)
         {
-            targetVisible = false;
-            for (VuforiaTrackable trackable : allTrackables)
-            {
-                if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible())
-                {
+            for (VuforiaTrackable trackable : allTrackables) {
+                if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
                     telemetry.addData("Visible Target", trackable.getName());
                     targetVisible = true;
 
-                    OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
-                    if (robotLocationTransform != null)
-                    {
+                    OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
+                    if (robotLocationTransform != null) {
                         lastLocation = robotLocationTransform;
                     }
                     break;
@@ -190,31 +186,46 @@ public class RoverRuckusTestNavigation extends LinearOpMode {
                 //Get the Rotational Information in Degrees
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
-
-
-                //Trying to park in the depot (testing)
-                if(lastLocation.getTranslation().get(0) > blueDepotLocation.getTranslation().get(0) + depotSize)//getting the x position
-                {
-                    //that is it is too far to the right
-                    robot.getChassisAssembly().moveBackwards(0.3);
-                    telemetry.addData("moving left", 0.3);
-                    telemetry.update();
-                }
-                else if(gamepad1.a == true)
-                {
-                    robot.getChassisAssembly().stopMoving();
-                }
-                else
-                {
-                    robot.getChassisAssembly().stopMoving();
-                }
+                break;
             }
-            else
-            {
+            else {
                 telemetry.addData("Visible Target", "none");
+
+                robot.getChassisAssembly().turnLeft(0.3);
+
             }
-            telemetry.update();
         }
+        telemetry.update();
+
+
+        //Now that the target is visible, stop moving
+        robot.getChassisAssembly().stopMoving();
+        String startingLocation = "UNKNOWN";
+
+        if(lastLocation.getTranslation().get(0) > 0 && lastLocation.getTranslation().get(1) > 0)
+        {
+            startingLocation = "BLUE_CRATER";
+        }
+        else if(lastLocation.getTranslation().get(0) < 0 && lastLocation.getTranslation().get(1) > 0)
+        {
+            startingLocation = "BLUE_DEPOT";
+        }
+        else if(lastLocation.getTranslation().get(0) > 0 && lastLocation.getTranslation().get(1) < 0)
+        {
+            startingLocation = "RED_DEPOT";
+        }
+        else if(lastLocation.getTranslation().get(0) < 0 && lastLocation.getTranslation().get(1) < 0)
+        {
+            startingLocation = "RED_CRATER";
+        }
+
+        telemetry.addData("StartingLocation: " , startingLocation);
+
+        telemetry.update();
+        sleep(5000);
+
+        
+
     }
 }
 

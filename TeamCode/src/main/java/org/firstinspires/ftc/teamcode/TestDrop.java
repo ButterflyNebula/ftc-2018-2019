@@ -92,7 +92,7 @@ public class TestDrop extends LinearOpMode {
             telemetry.update();
         }
 
-        roverRuckusbot.getLiftAssembly().unlockRobot(0.5);
+        roverRuckusbot.getLiftAssembly().unlockRobot();
         roverRuckusbot.getLiftAssembly().resetLift();
         telemetry.addData("outside while loop: ", "reached the bottom");
         telemetry.update();
