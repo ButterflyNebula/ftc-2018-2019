@@ -61,10 +61,10 @@ public class RobotHardware
         backLeftWheel = hwMap.get(DcMotor.class, "backLeft");
         backRightWheel = hwMap.get(DcMotor.class, "backRight");
 
-        frontRightWheel.setDirection(DcMotor.Direction.REVERSE);
-        backRightWheel.setDirection(DcMotor.Direction.REVERSE);
-        frontLeftWheel.setDirection(DcMotor.Direction.FORWARD);
-        backLeftWheel.setDirection(DcMotor.Direction.FORWARD);
+        frontRightWheel.setDirection(DcMotor.Direction.FORWARD);
+        backRightWheel.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftWheel.setDirection(DcMotor.Direction.REVERSE);
+        backLeftWheel.setDirection(DcMotor.Direction.REVERSE);
 
         //Initialize the lift motor and lock
         lift = hwMap.get(DcMotor.class, "lift");
