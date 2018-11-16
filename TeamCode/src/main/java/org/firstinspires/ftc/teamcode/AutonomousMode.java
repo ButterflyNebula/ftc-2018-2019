@@ -195,6 +195,7 @@ public class AutonomousMode extends LinearOpMode
         }
         else if(startingLocation == "BLUE_DEPOT")
         {
+            /*
             alignToTrackable(WHEEL_SPEED , 0, 5);
 
             turnToGold(WHEEL_SPEED, "LEFT", 10);
@@ -205,11 +206,14 @@ public class AutonomousMode extends LinearOpMode
             //Back away a little
             encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
 
+*/
             // Set up our telemetry dashboard
             composeTelemetry();
             telemetry.update();
             // Start the logging of measured acceleration
             robot.getNavigation().getImu().startAccelerationIntegration(new Position(), new Velocity(), 1000);
+
+            sleep(5000);
 
             turn180(10);
 
@@ -581,7 +585,7 @@ public class AutonomousMode extends LinearOpMode
                 robot.getChassisAssembly().turnRight(speed);
             }
         }
-        sleep(350);
+        sleep(250);
 
         robot.getChassisAssembly().stopMoving();
         sleep(250);
