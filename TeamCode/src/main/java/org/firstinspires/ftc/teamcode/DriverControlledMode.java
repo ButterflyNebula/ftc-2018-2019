@@ -23,7 +23,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
 
-@TeleOp(name="DriverControlledMode", group ="Tests")
+@TeleOp(name="DriverControlledMode", group ="Scrimmage")
 
 public class DriverControlledMode extends LinearOpMode {
 
@@ -32,12 +32,10 @@ public class DriverControlledMode extends LinearOpMode {
 
     private static final double     WHEEL_SPEED       = 1.0;
     private static final double     LIFT_UP_SPEED     = 0.6;
-    private static final double     LIFT_DOWN_SPEED   = 0.6;
-    private static final float      mmPerInch         = 25.4f;
-    private static final double     SHOULDER_SPEED    = 1.0;
-  //  boolean  targetVisible = false;
-  //  OpenGLMatrix  lastLocation = null;
-  //  List<VuforiaTrackable> allTrackables = null;
+    private static final double     LIFT_DOWN_SPEED   = 1.0;
+    private static final double     UNLOCK_POSITION   = 0.5;
+    private static final double     LOCK_POSITION     = 0.7;
+    private static       double     INTAKE_POWER      = 0.6;
 
     @Override public void runOpMode() {
 
@@ -50,14 +48,7 @@ public class DriverControlledMode extends LinearOpMode {
 
         while (opModeIsActive())
         {
-            if (gamepad1.dpad_up == true) {
-                roverRuckusBot.getLiftAssembly().liftUpRobot(LIFT_UP_SPEED);
-            } else if (gamepad1.dpad_down == true) {
-                roverRuckusBot.getLiftAssembly().lowerRobot(LIFT_DOWN_SPEED);
-            } else {
-                roverRuckusBot.getLiftAssembly().resetLift();
-            }
-
+            //GAMEPAD 1 CONTROLS
 
             //forwards
             if (gamepad1.left_stick_y > 0) {
@@ -82,45 +73,158 @@ public class DriverControlledMode extends LinearOpMode {
             //side left
             else if (gamepad1.left_trigger > 0) {
                 roverRuckusBot.getChassisAssembly().moveLeft(WHEEL_SPEED * gamepad1.left_trigger);
-            } else {
+            }
+            //stop moving
+            else
+            {
                 roverRuckusBot.getChassisAssembly().stopMoving();
             }
 
-            double power = 0.7;
-            //intake wheels
-            if (gamepad1.x == true)
-            {
-                while (power < 1)
-                {
-                    roverRuckusBot.getArmAssembly().Intake(-power);
-                    power = power + 0.1;
-                }
-                while (power > 0.6) {
-                    roverRuckusBot.getArmAssembly().Intake(-power);
-                    power = power - 0.1;
-                }
-                power = 0.6;
 
+            //move lift up for hooking onto lander
+            if (gamepad1.dpad_up == true
+                    && roverRuckusBot.getLiftAssembly().robotHardware.topTouch.getState() == true)
+            {
+                    roverRuckusBot.getLiftAssembly().liftUpRobot(LIFT_UP_SPEED);
             }
+            //move lift down for retracting and lifting robot
+            else if (gamepad1.dpad_down == true)
+            {
+                while(roverRuckusBot.getLiftAssembly().robotHardware.bottomTouch.getState() == true)
+                {
+                    roverRuckusBot.getLiftAssembly().lowerRobot(LIFT_DOWN_SPEED);
+                }
+                roverRuckusBot.getLiftAssembly().resetLift();
+                roverRuckusBot.getLiftAssembly().lockRobot(LOCK_POSITION);
+            }
+            //stop moving the lift
             else
             {
+                roverRuckusBot.getLiftAssembly().resetLift();
+            }
+
+
+            //unlocks the robot lift
+            if (gamepad1.b == true)
+            {
+                roverRuckusBot.getLiftAssembly().unlockRobot(UNLOCK_POSITION);
+
+            }
+            //locks the robot lift
+            if (gamepad1.x == true)
+            {
+                roverRuckusBot.getLiftAssembly().lockRobot(LOCK_POSITION);
+            }
+
+            //GAMEPAD 2 CONTROLS
+
+
+            //moves mineral lift up
+            if (gamepad2.dpad_up == true)
+            {
+                roverRuckusBot.getArmAssembly().mineralDelivery(0.5);
+            }
+            //moves mineral lift down
+            else if (gamepad2.dpad_down == true)
+            {
+                roverRuckusBot.getArmAssembly().mineralDelivery(-0.3);
+            }
+            //stops the mineral lift
+            else
+            {
+                roverRuckusBot.getArmAssembly().mineralDelivery(0);
+            }
+
+            //puts minerals into lander
+            if (gamepad2.x == true)
+            {
+                roverRuckusBot.getArmAssembly().mineralFlip(1);
+            }
+            //returns to the initial position
+            else if (gamepad2.b == true)
+            {
+                roverRuckusBot.getArmAssembly().mineralFlip(0);
+            }
+
+            // runs intake wheels inward
+            if (gamepad2.a == true)
+            {
+                while (INTAKE_POWER < 1)
+                {
+                    roverRuckusBot.getArmAssembly().Intake(-INTAKE_POWER);
+                    INTAKE_POWER = INTAKE_POWER + 0.1;
+                }
+                while (INTAKE_POWER > 0.6) {
+                    roverRuckusBot.getArmAssembly().Intake(-INTAKE_POWER);
+                    INTAKE_POWER = INTAKE_POWER - 0.1;
+                }
+                INTAKE_POWER = 0.6;
+            }
+            //stops the intake wheels
+            else {
                 roverRuckusBot.getArmAssembly().Intake(0);
             }
 
-            if (gamepad1.b == true)
+            //puts arm in initial mineral collecting position (vertical)
+            if (gamepad2.left_bumper == true)
             {
-                roverRuckusBot.getArmAssembly().OpenArm(0.7,0.7 );
+                while (roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.getPosition() != 0.5
+                        &&roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.getPosition() != 0.5)
+                {
+                    roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.setPosition(0.5);
+                    roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.setPosition(0.5);
+                }
+
+                sleep(250);
+                runtime.reset();
+                while (runtime.seconds() < 0.5)
+                {
+                    roverRuckusBot.getArmAssembly().armExtend(0.5);
+                }
+                roverRuckusBot.getArmAssembly().armExtend(0);
+
+                sleep(250);
+                while (roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.getPosition() != 0.1
+                        &&roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.getPosition() != 0.9)
+                {
+                    roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.setPosition(0.1);
+                    roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.setPosition(0.9);
+                }
             }
 
-
-            if (gamepad1.y == true) {
-                roverRuckusBot.getLiftAssembly().unlockRobot();
-
+            //moves the DC motor of the arm downwards
+            if (gamepad2.left_stick_y < 0)
+            {
+                roverRuckusBot.getArmAssembly().armExtend(0.5 * -gamepad2.left_stick_y);
             }
-            if (gamepad1.a== true) {
-                roverRuckusBot.getLiftAssembly().lockRobot();
-
+            //moves the DC motor of the arm upwards
+            else if (gamepad2.left_stick_y > 0)
+            {
+                roverRuckusBot.getArmAssembly().armReturn(0.5 * gamepad2.left_stick_y);
             }
+            //stops the DC motor of the arm
+            else
+            {
+                roverRuckusBot.getArmAssembly().armExtend(0);
+            }
+
+            //Moves the servo of the arm downwards
+            if (gamepad2.right_stick_y < 0)
+            {
+                roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.setPosition(
+                        roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.getPosition() + 0.005);
+                roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.setPosition(
+                        roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.getPosition() - 0.005);
+            }
+            //Moves the servo of the arm upwards
+            else if (gamepad2.right_stick_y > 0)
+            {
+                roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.setPosition(
+                        roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.getPosition() - 0.005);
+                roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.setPosition(
+                        roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.getPosition() + 0.005);
+            }
+
         }
     }
 
