@@ -117,8 +117,7 @@ public class DriverControlledMode extends LinearOpMode {
             }
 
             //GAMEPAD 2 CONTROLS
-
-
+            
             //moves mineral lift up
             if (gamepad2.dpad_up == true)
             {
