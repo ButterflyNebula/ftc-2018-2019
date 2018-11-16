@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 /**
@@ -12,6 +13,7 @@ public class ArmAssembly{
 
     protected ArmAssembly(RobotHardware hardware)
     {
+
         robotHardware = hardware;
     }
 
@@ -22,24 +24,27 @@ public class ArmAssembly{
         robotHardware.rightIntake.setPower(power);
     }
 
-    protected void OpenArm (double wristPos, double elbowPos)
+    protected void armReturn (double power)
     {
-        try {
-            robotHardware.wrist.setPosition(wristPos);
-            Thread.sleep(1000);
-            robotHardware.elbow.setPosition(elbowPos);
-            wristPos= wristPos - 0.4;
-            elbowPos = elbowPos - 0.4;
-            Thread.sleep(1000);
-            robotHardware.wrist.setPosition(wristPos);
-            Thread.sleep(1000);
-            robotHardware.elbow.setPosition(elbowPos);
-        }
-        catch(Exception e)
-        {
-
-        }
-
+            robotHardware.mineralArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            robotHardware.mineralArm.setPower(power);
     }
 
+    protected void armExtend (double power)
+    {
+        robotHardware.mineralArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robotHardware.mineralArm.setPower(-power);
+    }
+
+    protected void mineralDelivery (double power)
+    {
+        robotHardware.mineralLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robotHardware.mineralLift.setPower(-power);
+    }
+
+    protected void mineralFlip (double position)
+    {
+        robotHardware.goldBasket.setPosition(position);
+        robotHardware.silverBasket.setPosition(1 - position);
+    }
 }

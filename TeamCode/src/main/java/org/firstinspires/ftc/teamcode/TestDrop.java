@@ -87,7 +87,7 @@ public class TestDrop extends LinearOpMode {
 
         while (roverRuckusbot.getLiftAssembly().robotHardware.bottomTouch.getState() == true)
         {
-            roverRuckusbot.getLiftAssembly().lowerRobot(0.6);
+            roverRuckusbot.getLiftAssembly().lowerRobot(1);
             telemetry.addData("in while loop: ", "still going on");
             telemetry.update();
         }
