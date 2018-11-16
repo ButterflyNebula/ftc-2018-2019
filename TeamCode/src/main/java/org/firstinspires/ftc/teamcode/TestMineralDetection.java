@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -105,8 +106,10 @@ public class TestMineralDetection extends LinearOpMode {
             if (tfod != null) {
                 tfod.activate();
             }
-            while (opModeIsActive()) {
-                if (tfod != null) {
+            while (opModeIsActive())
+            {
+                if (tfod != null)
+                {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
@@ -145,6 +148,23 @@ public class TestMineralDetection extends LinearOpMode {
             for (Recognition recognition : updatedRecognitions) {
                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
                     goldMineralX = (int) recognition.getLeft();
+                    int leftValue = (int) recognition.getLeft();
+                    int rightvalue= (int) recognition.getRight();
+                    int topvalue = (int) recognition.getTop();
+                    int bottonvalue = (int) recognition.getBottom();
+                    int imgWidth = (int) recognition.getConfidence();
+                    int imgconfidence = (int) recognition.getImageWidth();
+                    int angletoobject = (int) recognition.estimateAngleToObject(AngleUnit.DEGREES);
+                    telemetry.addData("leftValue: " + leftValue
+                            + " rightvalue: " + rightvalue
+                            + " topvalue: " + topvalue
+                            + " bottonvalue: " + bottonvalue
+                            + " imgWidth: " + imgWidth
+                            + " imgconfidence" + imgconfidence
+                            + " angletoobject" + angletoobject , " gold mineral position data");
+                    telemetry.update();
+                    sleep(5000);
+
                 } else if (silverMineral1X == -1 && recognition.getLabel().equals(LABEL_SILVER_MINERAL)) {
                     silverMineral1X = (int) recognition.getLeft();
                 } else {
