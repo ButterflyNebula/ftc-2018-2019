@@ -160,6 +160,7 @@ public class AutonomousMode extends LinearOpMode
         }
         else if(startingLocation == "RED_DEPOT")
         {
+
             alignToTrackable(WHEEL_SPEED , 180, 5);
 
             turnToGold(WHEEL_SPEED, "LEFT", 10);
@@ -178,6 +179,8 @@ public class AutonomousMode extends LinearOpMode
 
             turn180(10);
 
+            sleep(5000);
+
             //Release Marker
         }
         else if(startingLocation == "BLUE_CRATER")
@@ -195,7 +198,7 @@ public class AutonomousMode extends LinearOpMode
         }
         else if(startingLocation == "BLUE_DEPOT")
         {
-            /*
+
             alignToTrackable(WHEEL_SPEED , 0, 5);
 
             turnToGold(WHEEL_SPEED, "LEFT", 10);
@@ -206,7 +209,7 @@ public class AutonomousMode extends LinearOpMode
             //Back away a little
             encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
 
-*/
+
             // Set up our telemetry dashboard
             composeTelemetry();
             telemetry.update();
@@ -216,6 +219,9 @@ public class AutonomousMode extends LinearOpMode
             sleep(5000);
 
             turn180(10);
+
+            sleep(5000);
+
 
             //Release Marker
 
@@ -576,7 +582,7 @@ public class AutonomousMode extends LinearOpMode
         }
         else
         {
-            if(count < 3)
+            if(count < 2)
             {
                 robot.getChassisAssembly().turnLeft(speed);
             }
@@ -714,6 +720,8 @@ public class AutonomousMode extends LinearOpMode
 
     public void composeTelemetry() {
 
+        telemetry.addData("Inside compose telementry", "");
+        telemetry.update();
         // At the beginning of each telemetry update, grab a bunch of data
         // from the IMU that we will then display in separate lines.
         telemetry.addAction(new Runnable() { @Override public void run()
@@ -773,7 +781,12 @@ public class AutonomousMode extends LinearOpMode
             telemetry.addData("compose telemetry angles.firstAngle is :", angles.firstAngle);
         else
             telemetry.addData("compose telemetry angles.firstAngle is :", "null");
+
         telemetry.update();
+        telemetry.addData("Leaving compose telemetry", "");
+        telemetry.update();
+        sleep(3000);
+
 
     }// end of composeTelemetry
 
@@ -791,28 +804,19 @@ public class AutonomousMode extends LinearOpMode
      */
     public void turn180(double maxSeconds)
     {
-        double angle = 179;
+        double angle = 180;
         double marginOfError = 2;
         boolean arrivedAtAngle = false;
         double speedReduction = 15;
         boolean speedReduced = false;
         double speed = WHEEL_SPEED;
 
-
-
         // Loop and update the dashboard
         while (arrivedAtAngle == false && runtime.seconds() < maxSeconds)
         {
-            if(angles  !=null)
-               telemetry.addData("angles.firstAngle is :", angles.firstAngle);
-            else
-                telemetry.addData("angles.firstAngle is :", "null");
-            telemetry.update();
-
             if (angles.firstAngle < (angle + marginOfError) && angles.firstAngle > (angle - marginOfError))
             {
                 arrivedAtAngle = true;
-
             }
 
             if(angles.firstAngle < (angle + speedReduction) && angles.firstAngle > (angle - speedReduction) && speedReduced == false)
@@ -849,7 +853,7 @@ public class AutonomousMode extends LinearOpMode
                     }
                 }
 
-                sleep(250);
+                sleep(1000);
                 robot.getChassisAssembly().stopMoving();
             }
 
@@ -858,12 +862,10 @@ public class AutonomousMode extends LinearOpMode
 
         runtime.reset();
 
-
-
-        sleep(200);
         //Display that the turn is completed
         telemetry.addData("Turned the desired angle", angles.firstAngle);
         telemetry.update();
+        sleep(5000);
     }//end of turn180
 
 }//end of class
