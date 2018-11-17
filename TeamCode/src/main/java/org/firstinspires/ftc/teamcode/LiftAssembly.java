@@ -11,6 +11,9 @@ public class LiftAssembly{
 
     RobotHardware robotHardware;
 
+    private static final double     UNLOCK_POSITION   = 0.5;
+    private static final double     LOCK_POSITION     = 0.7;
+
 
     protected LiftAssembly(RobotHardware hardware)
     {
@@ -35,14 +38,14 @@ public class LiftAssembly{
     }
 
 
-    protected void lockRobot(double position)
+    protected void lockRobot()
     {
-        robotHardware.liftLock.setPosition(position);
+        robotHardware.liftLock.setPosition(LOCK_POSITION);
     }
 
-    protected void unlockRobot(double position)
+    protected void unlockRobot()
     {
-        robotHardware.liftLock.setPosition(position);
+        robotHardware.liftLock.setPosition(UNLOCK_POSITION);
     }
 
 }

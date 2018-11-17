@@ -5,12 +5,19 @@ package org.firstinspires.ftc.teamcode;
  */
 
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+
+
+
 
 
 public class RobotHardware
@@ -34,6 +41,11 @@ public class RobotHardware
     public Servo silverBasket = null;
     public DigitalChannel bottomTouch = null;
     public DigitalChannel topTouch = null;
+    Rev2mDistanceSensor rev2mDistanceSensor;  // Hardware Device Object
+
+
+    public BNO055IMU imu = null;
+
     public DigitalChannel backTouch = null;
     public DigitalChannel frontTouch = null;
 
@@ -49,10 +61,10 @@ public class RobotHardware
         backLeftWheel = hwMap.get(DcMotor.class, "backLeft");
         backRightWheel = hwMap.get(DcMotor.class, "backRight");
 
-        frontRightWheel.setDirection(DcMotor.Direction.REVERSE);
-        backRightWheel.setDirection(DcMotor.Direction.REVERSE);
-        frontLeftWheel.setDirection(DcMotor.Direction.FORWARD);
-        backLeftWheel.setDirection(DcMotor.Direction.FORWARD);
+        frontRightWheel.setDirection(DcMotor.Direction.FORWARD);
+        backRightWheel.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftWheel.setDirection(DcMotor.Direction.REVERSE);
+        backLeftWheel.setDirection(DcMotor.Direction.REVERSE);
 
         //Initialize the lift motor and lock
         lift = hwMap.get(DcMotor.class, "lift");
@@ -77,7 +89,33 @@ public class RobotHardware
         leftIntake.setDirection(CRServo.Direction.FORWARD);
         rightIntake.setDirection(CRServo.Direction.REVERSE);
 
+
+        rev2mDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "distance_sensor");
+
+
         //Initializing the Arm motors
+       // shoulder = hwMap.get(DcMotor.class, "shoulder");
+       // elbow  = hwMap.get(Servo.class, "elbow");
+        //wrist = hwMap.get(Servo.class, "wrist");
+
+
+        // Set up the parameters with which we will use our IMU. Note that integration
+        // algorithm here just reports accelerations to the logcat log; it doesn't actually
+        // provide positional information.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "RoverRuckus13747.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hwMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
         mineralArm = hwMap.get(DcMotor.class, "mineralArm");
         leftSortServo = hwMap.get(Servo.class, "leftSortServo");
         rightSortServo = hwMap.get(Servo.class, "rightSortServo");

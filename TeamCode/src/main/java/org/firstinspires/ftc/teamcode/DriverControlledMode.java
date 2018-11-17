@@ -33,8 +33,6 @@ public class DriverControlledMode extends LinearOpMode {
     private static final double     WHEEL_SPEED       = 1.0;
     private static final double     LIFT_UP_SPEED     = 0.6;
     private static final double     LIFT_DOWN_SPEED   = 1.0;
-    private static final double     UNLOCK_POSITION   = 0.5;
-    private static final double     LOCK_POSITION     = 0.7;
     private static       double     INTAKE_POWER      = 0.6;
 
     @Override public void runOpMode() {
@@ -95,7 +93,7 @@ public class DriverControlledMode extends LinearOpMode {
                     roverRuckusBot.getLiftAssembly().lowerRobot(LIFT_DOWN_SPEED);
                 }
                 roverRuckusBot.getLiftAssembly().resetLift();
-                roverRuckusBot.getLiftAssembly().lockRobot(LOCK_POSITION);
+                roverRuckusBot.getLiftAssembly().lockRobot();
             }
             //stop moving the lift
             else
@@ -107,13 +105,13 @@ public class DriverControlledMode extends LinearOpMode {
             //unlocks the robot lift
             if (gamepad1.b == true)
             {
-                roverRuckusBot.getLiftAssembly().unlockRobot(UNLOCK_POSITION);
+                roverRuckusBot.getLiftAssembly().unlockRobot();
 
             }
             //locks the robot lift
             if (gamepad1.x == true)
             {
-                roverRuckusBot.getLiftAssembly().lockRobot(LOCK_POSITION);
+                roverRuckusBot.getLiftAssembly().lockRobot();
             }
 
             //GAMEPAD 2 CONTROLS
