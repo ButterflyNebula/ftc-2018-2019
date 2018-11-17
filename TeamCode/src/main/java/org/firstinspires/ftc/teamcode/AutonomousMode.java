@@ -160,7 +160,10 @@ public class AutonomousMode extends LinearOpMode
             encoderDrive(WHEEL_SPEED, -28, -28, 5.0);
 
             //Back away a little
-            encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
+            //encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
+
+            //stop moving
+            robot.getChassisAssembly().stopMoving();
         }
         else if(startingLocation == "RED_DEPOT")
         {
@@ -173,7 +176,7 @@ public class AutonomousMode extends LinearOpMode
             encoderDrive(WHEEL_SPEED, -28, -28, 5.0);
 
             //Back away a little
-            encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
+            //encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
 
 
             //uTurn(2);
@@ -206,7 +209,10 @@ public class AutonomousMode extends LinearOpMode
             encoderDrive(WHEEL_SPEED, -28, -28, 5.0);
 
             //Back away a little
-            encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
+            //encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
+
+            //stop moving
+            robot.getChassisAssembly().stopMoving();
 
         }
         else if(startingLocation == "BLUE_DEPOT")
@@ -220,8 +226,10 @@ public class AutonomousMode extends LinearOpMode
             encoderDrive(WHEEL_SPEED, -28, -28, 5.0);
 
             //Back away a little
-            encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
+            //encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
 
+            //stop moving
+            robot.getChassisAssembly().stopMoving();
 
             // Set up our telemetry dashboard
             /*
