@@ -133,7 +133,6 @@ public class DriverControlledMode extends LinearOpMode {
 
             //GAMEPAD 2 CONTROLS
 
-
             //moves mineral lift up
             if (gamepad2.dpad_up == true)
             {
@@ -197,7 +196,7 @@ public class DriverControlledMode extends LinearOpMode {
             }
             //moves the DC motor of the wrist
             if (gamepad2.right_stick_y != 0){
-                roverRuckusBot.getArmAssembly().wristExtend(gamepad2.right_stick_y*0.3);
+                roverRuckusBot.getArmAssembly().wristExtend(-gamepad2.right_stick_y*0.3);
             }
             //stops the DC motor of the wrist
             else {
