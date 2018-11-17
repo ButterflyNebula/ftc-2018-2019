@@ -30,10 +30,12 @@ public class DriverControlledMode extends LinearOpMode {
     private RoverRobot roverRuckusBot = new RoverRobot();
     private ElapsedTime runtime = new ElapsedTime();
 
-    private static final double     WHEEL_SPEED       = 1.0;
+    private static       double     WHEEL_SPEED       = 1.0;
     private static final double     LIFT_UP_SPEED     = 0.6;
     private static final double     LIFT_DOWN_SPEED   = 1.0;
     private static       double     INTAKE_POWER      = 0.6;
+
+    boolean reducedSpeed = false;
 
     @Override public void runOpMode() {
 
@@ -114,6 +116,21 @@ public class DriverControlledMode extends LinearOpMode {
                 roverRuckusBot.getLiftAssembly().lockRobot();
             }
 
+            if(gamepad1.a)
+            {
+                if(reducedSpeed)
+                {
+                    WHEEL_SPEED = WHEEL_SPEED * 2;
+                    reducedSpeed = false;
+                }
+                else
+                {
+                    WHEEL_SPEED = WHEEL_SPEED /2;
+                    reducedSpeed = true;
+                }
+            }
+
+
             //GAMEPAD 2 CONTROLS
 
 
@@ -163,33 +180,6 @@ public class DriverControlledMode extends LinearOpMode {
                 roverRuckusBot.getArmAssembly().Intake(0);
             }
 
-            //puts arm in initial mineral collecting position (vertical)
-            if (gamepad2.left_bumper == true)
-            {
-                while (roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.getPosition() != 0.5
-                        &&roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.getPosition() != 0.5)
-                {
-                    roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.setPosition(0.5);
-                    roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.setPosition(0.5);
-                }
-
-                sleep(250);
-                runtime.reset();
-                while (runtime.seconds() < 0.5)
-                {
-                    roverRuckusBot.getArmAssembly().armExtend(0.5);
-                }
-                roverRuckusBot.getArmAssembly().armExtend(0);
-
-                sleep(250);
-                while (roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.getPosition() != 0.1
-                        &&roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.getPosition() != 0.9)
-                {
-                    roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.setPosition(0.1);
-                    roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.setPosition(0.9);
-                }
-            }
-
             //moves the DC motor of the arm downwards
             if (gamepad2.left_stick_y < 0)
             {
@@ -205,24 +195,14 @@ public class DriverControlledMode extends LinearOpMode {
             {
                 roverRuckusBot.getArmAssembly().armExtend(0);
             }
-
-            //Moves the servo of the arm downwards
-            if (gamepad2.right_stick_y < 0)
-            {
-                roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.setPosition(
-                        roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.getPosition() + 0.005);
-                roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.setPosition(
-                        roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.getPosition() - 0.005);
+            //moves the DC motor of the wrist
+            if (gamepad2.right_stick_y != 0){
+                roverRuckusBot.getArmAssembly().wristExtend(gamepad2.right_stick_y*0.3);
             }
-            //Moves the servo of the arm upwards
-            else if (gamepad2.right_stick_y > 0)
-            {
-                roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.setPosition(
-                        roverRuckusBot.getArmAssembly().robotHardware.rightSortServo.getPosition() - 0.005);
-                roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.setPosition(
-                        roverRuckusBot.getArmAssembly().robotHardware.leftSortServo.getPosition() + 0.005);
+            //stops the DC motor of the wrist
+            else {
+                roverRuckusBot.getArmAssembly().wristExtend(0);
             }
-
         }
     }
 
