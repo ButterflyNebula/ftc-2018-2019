@@ -139,7 +139,7 @@ public class AutonomousMode extends LinearOpMode
         telemetry.update();
         waitForStart();
 
-        //drop();
+        drop();
 
         sleep(500);
 
@@ -176,12 +176,7 @@ public class AutonomousMode extends LinearOpMode
             encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
 
 
-            //Make a U-turn
-            runtime.reset();
-            while(opModeIsActive() && runtime.seconds() < 1.5)
-            {
-                robot.getChassisAssembly().turnRight(WHEEL_SPEED);
-            }
+            //uTurn(2);
 
             robot.getChassisAssembly().stopMoving();
 
@@ -921,7 +916,7 @@ public class AutonomousMode extends LinearOpMode
     /**
      * DROP METHOD
      */
-    private void drop ()
+  /*  private void drop ()
     {
         while (opModeIsActive())
         {
@@ -930,11 +925,12 @@ public class AutonomousMode extends LinearOpMode
             break;
         }
     }
+    */
 
     /**
      * RELEASE ROBOT METHOD
      */
-    private void releaseRobot() {
+    private void drop() {
 
         while (robot.getLiftAssembly().robotHardware.bottomTouch.getState() == true)
         {
@@ -972,7 +968,20 @@ public class AutonomousMode extends LinearOpMode
             robot.getLiftAssembly().lowerRobot(0.5);
         }
         robot.getLiftAssembly().resetLift();
+        }//end of drop
 
+
+    private void uTurn(double maxSeconds)
+    {
+        runtime.reset();
+        while(opModeIsActive() && runtime.seconds() < maxSeconds)
+        {
+            robot.getChassisAssembly().turnRight(WHEEL_SPEED);
+        }
+
+        robot.getChassisAssembly().stopMoving();
+
+        sleep(250);
     }
 
 }//end of class

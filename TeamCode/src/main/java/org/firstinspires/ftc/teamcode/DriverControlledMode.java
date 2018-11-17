@@ -35,7 +35,6 @@ public class DriverControlledMode extends LinearOpMode {
     private static final double     LIFT_DOWN_SPEED   = 1.0;
     private static       double     INTAKE_POWER      = 0.6;
 
-    boolean reducedSpeed = false;
 
     @Override public void runOpMode() {
 
@@ -116,20 +115,6 @@ public class DriverControlledMode extends LinearOpMode {
                 roverRuckusBot.getLiftAssembly().lockRobot();
             }
 
-            if(gamepad1.a)
-            {
-                if(reducedSpeed)
-                {
-                    WHEEL_SPEED = WHEEL_SPEED * 2;
-                    reducedSpeed = false;
-                }
-                else
-                {
-                    WHEEL_SPEED = WHEEL_SPEED /2;
-                    reducedSpeed = true;
-                }
-            }
-
 
             //GAMEPAD 2 CONTROLS
 
@@ -182,12 +167,12 @@ public class DriverControlledMode extends LinearOpMode {
             //moves the DC motor of the arm downwards
             if (gamepad2.left_stick_y < 0)
             {
-                roverRuckusBot.getArmAssembly().armExtend(0.5 * -gamepad2.left_stick_y);
+                roverRuckusBot.getArmAssembly().armReturn(0.5 * -gamepad2.left_stick_y);
             }
             //moves the DC motor of the arm upwards
             else if (gamepad2.left_stick_y > 0)
             {
-                roverRuckusBot.getArmAssembly().armReturn(0.5 * gamepad2.left_stick_y);
+                roverRuckusBot.getArmAssembly().armExtend(0.5 * gamepad2.left_stick_y);
             }
             //stops the DC motor of the arm
             else
@@ -204,6 +189,4 @@ public class DriverControlledMode extends LinearOpMode {
             }
         }
     }
-
-
 }
