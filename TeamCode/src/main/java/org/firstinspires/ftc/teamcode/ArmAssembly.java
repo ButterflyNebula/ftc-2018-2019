@@ -36,6 +36,12 @@ public class ArmAssembly{
         robotHardware.mineralArm.setPower(-power);
     }
 
+    protected void wristExtend (double power)
+    {
+        robotHardware.mineralArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robotHardware.mineralWrist.setPower(power);
+    }
+
     protected void mineralDelivery (double power)
     {
         robotHardware.mineralLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

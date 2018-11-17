@@ -30,12 +30,11 @@ public class RobotHardware
     public DcMotor backRightWheel = null;
     public DcMotor lift = null;
     public DcMotor mineralLift = null;
+    public DcMotor mineralWrist = null;
     public Servo   phoneSwivel = null;
     public CRServo leftIntake = null;
     public CRServo rightIntake = null;
     public DcMotor mineralArm = null;
-    public Servo   leftSortServo = null;
-    public Servo   rightSortServo = null;
     public Servo   liftLock = null;
     public Servo   goldBasket = null;
     public Servo silverBasket = null;
@@ -117,8 +116,7 @@ public class RobotHardware
         imu.initialize(parameters);
 
         mineralArm = hwMap.get(DcMotor.class, "mineralArm");
-        leftSortServo = hwMap.get(Servo.class, "leftSortServo");
-        rightSortServo = hwMap.get(Servo.class, "rightSortServo");
+        mineralWrist = hwMap.get(DcMotor.class, "mineralWrist");
     }
 
     public HardwareMap getHwMap() {
