@@ -139,6 +139,10 @@ public class AutonomousMode extends LinearOpMode
         telemetry.update();
         waitForStart();
 
+        //drop();
+
+        sleep(500);
+
         moveFromLander(WHEEL_SPEED , 1.5);
 
         findTrackable(WHEEL_SPEED , "LEFT" , 5);
@@ -171,6 +175,19 @@ public class AutonomousMode extends LinearOpMode
             //Back away a little
             encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
 
+
+            //Make a U-turn
+            runtime.reset();
+            while(opModeIsActive() && runtime.seconds() < 1.5)
+            {
+                robot.getChassisAssembly().turnRight(WHEEL_SPEED);
+            }
+
+            robot.getChassisAssembly().stopMoving();
+
+            sleep(500);
+
+            /*
             // Set up our telemetry dashboard
             composeTelemetry();
             telemetry.update();
@@ -182,6 +199,7 @@ public class AutonomousMode extends LinearOpMode
             sleep(5000);
 
             //Release Marker
+            */
         }
         else if(startingLocation == "BLUE_CRATER")
         {
@@ -211,12 +229,12 @@ public class AutonomousMode extends LinearOpMode
 
 
             // Set up our telemetry dashboard
+            /*
             composeTelemetry();
             telemetry.update();
             // Start the logging of measured acceleration
             robot.getNavigation().getImu().startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
-            sleep(5000);
 
             turn180(10);
 
@@ -224,6 +242,7 @@ public class AutonomousMode extends LinearOpMode
 
 
             //Release Marker
+            */
 
 
         }
@@ -811,8 +830,37 @@ public class AutonomousMode extends LinearOpMode
         boolean speedReduced = false;
         double speed = WHEEL_SPEED;
 
+        telemetry.addData("First Angle is: " , angles.firstAngle);
+        telemetry.addData("Second Angle is: " , angles.secondAngle);
+        telemetry.addData("Third Angle is: " , angles.thirdAngle);
+        telemetry.update();
+        sleep(5000);
+
+
+        while(opModeIsActive() && arrivedAtAngle == false && runtime.seconds() < maxSeconds)
+        {
+            if(angles.secondAngle < (angle - marginOfError))
+            {
+                robot.getChassisAssembly().turnRight(speed);
+            }
+            else if(angles.secondAngle > (angle + marginOfError))
+            {
+                robot.getChassisAssembly().turnLeft(speed);
+            }
+            else
+            {
+                robot.getChassisAssembly().stopMoving();
+                arrivedAtAngle = true;
+            }
+
+            sleep(250);
+
+            robot.getChassisAssembly().stopMoving();
+            sleep(500);
+        }
+
         // Loop and update the dashboard
-        while (arrivedAtAngle == false && runtime.seconds() < maxSeconds)
+     /*   while (arrivedAtAngle == false && runtime.seconds() < maxSeconds)
         {
             if (angles.firstAngle < (angle + marginOfError) && angles.firstAngle > (angle - marginOfError))
             {
@@ -859,6 +907,7 @@ public class AutonomousMode extends LinearOpMode
 
             telemetry.update();
         }
+        */
 
         runtime.reset();
 
@@ -867,6 +916,64 @@ public class AutonomousMode extends LinearOpMode
         telemetry.update();
         sleep(5000);
     }//end of turn180
+
+
+    /**
+     * DROP METHOD
+     */
+    private void drop ()
+    {
+        while (opModeIsActive())
+        {
+            //Closing lift to max shrink
+            releaseRobot();
+            break;
+        }
+    }
+
+    /**
+     * RELEASE ROBOT METHOD
+     */
+    private void releaseRobot() {
+
+        while (robot.getLiftAssembly().robotHardware.bottomTouch.getState() == true)
+        {
+            robot.getLiftAssembly().lowerRobot(1);
+            telemetry.addData("in while loop: ", "still going on");
+            telemetry.update();
+        }
+
+        robot.getLiftAssembly().unlockRobot();
+        robot.getLiftAssembly().resetLift();
+        telemetry.addData("outside while loop: ", "reached the bottom");
+        telemetry.update();
+
+        while (robot.getLiftAssembly().robotHardware.topTouch.getState() == true)
+        {
+            robot.getLiftAssembly().liftUpRobot(0.5);
+            telemetry.addData("in second while loop", "still going on");
+            telemetry.update();
+        }
+        robot.getLiftAssembly().resetLift();
+        telemetry.addData("outside 2 while loop: ", "reached the top");
+        telemetry.update();
+
+        runtime.reset();
+        while (runtime.seconds() < 0.2)
+        {
+            robot.getChassisAssembly().moveForward(0.4);
+        }
+        robot.getChassisAssembly().stopMoving();
+        telemetry.addData("in stop moving","stopped");
+        telemetry.update();
+
+        while (robot.getLiftAssembly().robotHardware.bottomTouch.getState() == true)
+        {
+            robot.getLiftAssembly().lowerRobot(0.5);
+        }
+        robot.getLiftAssembly().resetLift();
+
+    }
 
 }//end of class
 
