@@ -93,8 +93,8 @@ public class DriverControlledMode extends LinearOpMode {
                 {
                     roverRuckusBot.getLiftAssembly().lowerRobot(LIFT_DOWN_SPEED);
                 }
-                roverRuckusBot.getLiftAssembly().resetLift();
                 roverRuckusBot.getLiftAssembly().lockRobot();
+                roverRuckusBot.getLiftAssembly().resetLift();
             }
             //stop moving the lift
             else
@@ -153,15 +153,34 @@ public class DriverControlledMode extends LinearOpMode {
                     roverRuckusBot.getArmAssembly().Intake(-INTAKE_POWER);
                     INTAKE_POWER = INTAKE_POWER + 0.1;
                 }
-                while (INTAKE_POWER > 0.6) {
+                while (INTAKE_POWER > 0.7) {
                     roverRuckusBot.getArmAssembly().Intake(-INTAKE_POWER);
                     INTAKE_POWER = INTAKE_POWER - 0.1;
                 }
-                INTAKE_POWER = 0.6;
+                INTAKE_POWER = 0.7;
             }
             //stops the intake wheels
             else {
                 roverRuckusBot.getArmAssembly().Intake(0);
+            }
+
+            if (gamepad2.y == true)
+            {
+                while (INTAKE_POWER < 1)
+                {
+                    roverRuckusBot.getArmAssembly().Outake(-INTAKE_POWER);
+                    INTAKE_POWER = INTAKE_POWER + 0.1;
+                }
+                while (INTAKE_POWER > 0.7) {
+                    roverRuckusBot.getArmAssembly().Outake(-INTAKE_POWER);
+                    INTAKE_POWER = INTAKE_POWER - 0.1;
+                }
+                INTAKE_POWER = 0.7;
+            }
+            //stops the intake wheels
+            else
+                {
+                roverRuckusBot.getArmAssembly().Outake(0);
             }
 
             //moves the DC motor of the arm downwards

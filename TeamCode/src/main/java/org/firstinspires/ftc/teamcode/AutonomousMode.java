@@ -143,7 +143,7 @@ public class AutonomousMode extends LinearOpMode
 
         sleep(500);
 
-        moveFromLander(WHEEL_SPEED , 1.5);
+        moveFromLander(WHEEL_SPEED * 2 , 0.75);
 
         findTrackable(WHEEL_SPEED , "LEFT" , 5);
 
@@ -176,7 +176,7 @@ public class AutonomousMode extends LinearOpMode
             encoderDrive(WHEEL_SPEED, -28, -28, 5.0);
 
             //Back away a little
-            //encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
+            encoderDrive(WHEEL_SPEED , 10 , 10 , 2.0);
 
 
             //uTurn(2);
@@ -209,7 +209,7 @@ public class AutonomousMode extends LinearOpMode
             encoderDrive(WHEEL_SPEED, -28, -28, 5.0);
 
             //Back away a little
-            //encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
+            encoderDrive(WHEEL_SPEED , 10 , 10 , 2.0);
 
             //stop moving
             robot.getChassisAssembly().stopMoving();
@@ -226,26 +226,11 @@ public class AutonomousMode extends LinearOpMode
             encoderDrive(WHEEL_SPEED, -28, -28, 5.0);
 
             //Back away a little
-            //encoderDrive(WHEEL_SPEED , 6 , 6 , 2.0);
+            encoderDrive(WHEEL_SPEED , 10 , 10 , 2.0);
 
             //stop moving
             robot.getChassisAssembly().stopMoving();
 
-            // Set up our telemetry dashboard
-            /*
-            composeTelemetry();
-            telemetry.update();
-            // Start the logging of measured acceleration
-            robot.getNavigation().getImu().startAccelerationIntegration(new Position(), new Velocity(), 1000);
-
-
-            turn180(10);
-
-            sleep(5000);
-
-
-            //Release Marker
-            */
 
 
         }
@@ -963,9 +948,9 @@ public class AutonomousMode extends LinearOpMode
         telemetry.update();
 
         runtime.reset();
-        while (runtime.seconds() < 0.2)
+        while (runtime.seconds() < 0.3)
         {
-            robot.getChassisAssembly().moveForward(0.4);
+            robot.getChassisAssembly().moveForward(0.6);
         }
         robot.getChassisAssembly().stopMoving();
         telemetry.addData("in stop moving","stopped");

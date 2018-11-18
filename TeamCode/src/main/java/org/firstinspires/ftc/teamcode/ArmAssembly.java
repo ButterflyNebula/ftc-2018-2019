@@ -24,6 +24,12 @@ public class ArmAssembly{
         robotHardware.rightIntake.setPower(power);
     }
 
+    protected void Outake(double power)
+    {
+        robotHardware.rightIntake.setPower(-power);
+        robotHardware.leftIntake.setPower(-power);
+    }
+
     protected void armReturn (double power)
     {
             robotHardware.mineralArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
