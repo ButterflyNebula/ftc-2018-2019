@@ -1,15 +1,17 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.qualifier;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.teamcode.qualifier.RobotHardware;
 
 
 /**
  * Created by Athira on 10/14/2018.
  */
 
-public class ChassisAssembly{
+public class ChassisAssembly
+{
 
-    double driveSpeed = 0.3;
     RobotHardware robotHardware;
 
     protected ChassisAssembly(RobotHardware hardware)

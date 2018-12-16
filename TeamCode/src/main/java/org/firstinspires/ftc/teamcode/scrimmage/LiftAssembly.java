@@ -1,7 +1,4 @@
-package org.firstinspires.ftc.teamcode;
-
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+package org.firstinspires.ftc.teamcode.scrimmage;
 
 /**
  * Created by Athira on 10/14/2018.
