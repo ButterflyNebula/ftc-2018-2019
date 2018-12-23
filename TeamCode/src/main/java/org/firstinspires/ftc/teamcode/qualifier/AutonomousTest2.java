@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.sun.source.tree.WhileLoopTree;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -127,6 +128,7 @@ public class AutonomousTest2 extends LinearOpMode
                 //Print the location
                 telemetry.addData("X" , lastLocation.getTranslation().get(0));
                 telemetry.addData("Y", lastLocation.getTranslation().get(1));
+                telemetry.addData("Robot Angle" , robotAngle);
                 telemetry.update();
             }
 
@@ -136,10 +138,44 @@ public class AutonomousTest2 extends LinearOpMode
                 goldLoc++;
             }
 
+            if(gamepad1.y)
+            {
+                encoderDrive(WHEEL_SPEED , 55 , 6);
+                telemetry.addData("Gold Loc" , goldLoc);
+            }
 
+            if(gamepad1.right_bumper)
+            {
+
+                    encoderTurn(WHEEL_SPEED , 90 , "RIGHT" , 2);
+
+                    sleep(2000);
+
+                    runtime.reset();
+                    while(opModeIsActive() && runtime.seconds() < 4)
+                    {
+                        robot.getChassisAssembly().moveLeft(0.2);
+                    }
+
+                    robot.getChassisAssembly().stopMoving();
+
+                    sleep(2000);
+
+                    runtime.reset();
+                    while(opModeIsActive() && runtime.seconds() < 0.4)
+                    {
+                        robot.getChassisAssembly().moveRight(WHEEL_SPEED);
+                    }
+                    robot.getChassisAssembly().stopMoving();
+
+                    sleep(2000);
+
+                    encoderDrive(WHEEL_SPEED , 15 , 5);
+                    sleep(250);
+
+                    encoderDrive(WHEEL_SPEED , -80 , 10);
+            }
         }
-
-
     }
 
 
@@ -197,12 +233,12 @@ public class AutonomousTest2 extends LinearOpMode
 
 
         //Phone Location
-        final int CAMERA_FORWARD_DISPLACEMENT  = 216; //camera is 216  mm in front of the robot center
+        final int CAMERA_FORWARD_DISPLACEMENT  = 330; //camera is 216  mm in front of the robot center
         final int CAMERA_VERTICAL_DISPLACEMENT = 102;
-        final int CAMERA_HORIZONTAL_DISPLACEMENT = 0; //camera is 51 mm to the left of the robot center
+        final int CAMERA_HORIZONTAL_DISPLACEMENT = -102; //camera is 51 mm to the left of the robot center
 
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
-                .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_HORIZONTAL_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+                .translation(CAMERA_HORIZONTAL_DISPLACEMENT, CAMERA_FORWARD_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES,
                         90 , -90, 180));
 
@@ -256,7 +292,9 @@ public class AutonomousTest2 extends LinearOpMode
     {
         runtime.reset();
 
-        while(opModeIsActive() && targetVisible==false)
+        encoderTurn(WHEEL_SPEED , 25 , "LEFT" , 5);
+
+        while(opModeIsActive() && targetVisible==false && runtime.seconds() < turnSeconds)
         {
             for (VuforiaTrackable trackable : allTrackables)
             {
@@ -299,41 +337,7 @@ public class AutonomousTest2 extends LinearOpMode
             {
                 telemetry.addData("Visible Target", "none");
                 telemetry.update();
-
-                if(direction == "LEFT")
-                {
-                    robot.getChassisAssembly().turnLeft(speed);
-                }
-                else if(direction == "RIGHT")
-                {
-                    robot.getChassisAssembly().turnRight(speed);
-                }
-                else
-                {
-                    robot.getChassisAssembly().stopMoving();
-                    telemetry.addData("INVALID DIRECTION" , direction);
-                    telemetry.update();
-                }
-                sleep(200);
             }
-
-            robot.getChassisAssembly().stopMoving();
-            sleep(300);
-
-            if(runtime.seconds() > turnSeconds)
-            {
-                runtime.reset();
-
-                if(direction == "LEFT")
-                {
-                    direction = "RIGHT";
-                }
-                else if(direction == "RIGHT")
-                {
-                    direction = "LEFT";
-                }
-            }
-
         }
 
         //Now that the target is visible, stop moving
@@ -394,6 +398,10 @@ public class AutonomousTest2 extends LinearOpMode
         translation = lastLocation.getTranslation();
         rotation = Orientation.getOrientation(lastLocation , EXTRINSIC , XYZ , DEGREES);
 
+
+        robotAngle = Math.abs(rotation.thirdAngle) - 180;
+
+
         sleep(250);
     }//end of alignToTrackable
 
@@ -445,24 +453,30 @@ public class AutonomousTest2 extends LinearOpMode
         double robotX = translation.get(0);
         double robotY = translation.get(1);
 
+        double angleToTurn = 0;
 
         if(goldLoc == -1)
         {
             mineralX = LeftMineralLoc.getTranslation().get(0);
             mineralY = LeftMineralLoc.getTranslation().get(1);
+            angleToTurn = 5;
+
         }
         else if (goldLoc == 0)
         {
             mineralX = CenterMineralLoc.getTranslation().get(0);
             mineralY = CenterMineralLoc.getTranslation().get(1);
+            angleToTurn = 45;
         }
         else
         {
             mineralX = RightMineralLoc.getTranslation().get(0);
             mineralY = RightMineralLoc.getTranslation().get(1);
+            angleToTurn=45;
         }
 
         //Now to find the Angle to Turn
+        /*
         double angle;
         double division = Math.abs(mineralX-robotX) / Math.abs(mineralY - robotY);
 
@@ -478,11 +492,15 @@ public class AutonomousTest2 extends LinearOpMode
         telemetry.addData("Angle: " , angle);
         telemetry.addData("Angle to Turn" , angleToTurn);
         telemetry.update();
-        sleep(30000);
+        sleep(5000);
 
         encoderTurn(WHEEL_SPEED , angleToTurn , "LEFT" , 2);
 
         robotAngle = angle;
+        */
+
+        encoderTurn(WHEEL_SPEED , angleToTurn , "LEFT" , 2);
+
 
     }
 
@@ -503,6 +521,9 @@ public class AutonomousTest2 extends LinearOpMode
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
+            robot.getChassisAssembly().changeToEncoderMode();
+
+
             // Determine new target position, and pass to motor controller
             if(direction == "LEFT")
             {
@@ -521,8 +542,8 @@ public class AutonomousTest2 extends LinearOpMode
 
             robot.getChassisAssembly().setBackLeftWheelTargetPosition(newBackLeftTarget);
             robot.getChassisAssembly().setBackRightWheelTargetPosition(newBackRightTarget);
-            robot.getChassisAssembly().setFrontLeftWheelPosition(newFrontLeftTarget);
-            robot.getChassisAssembly().setFrontRightWeelPosition(newFrontRightTarget);
+            robot.getChassisAssembly().setFrontLeftWheelTargetPosition(newFrontLeftTarget);
+            robot.getChassisAssembly().setFrontRightWeelTargetPosition(newFrontRightTarget);
 
             // Turn On RUN_TO_POSITION
             robot.getChassisAssembly().setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -560,5 +581,71 @@ public class AutonomousTest2 extends LinearOpMode
             robot.getChassisAssembly().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }//end of encoderTurn
+
+    /**
+     * ENCODERDRIVE METHOD - used for moving the robot forward or backwards
+     * @param speed at which the robot will move
+     * @param inches - the inches to move forward or backwards.  Negative if backwards.
+     * @param timeoutS
+     */
+    public void encoderDrive(double speed, double inches, double timeoutS)
+    {
+        int newBackLeftTarget;
+        int newBackRightTarget;
+        int newFrontLeftTarget;
+        int newFrontRightTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newBackLeftTarget = robot.getChassisAssembly().getBackLeftWheelCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
+            newBackRightTarget = robot.getChassisAssembly().getBackRightWheelCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
+            newFrontLeftTarget = robot.getChassisAssembly().getFrontLeftWheelCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
+            newFrontRightTarget = robot.getChassisAssembly().getFrontRightWheelCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
+
+
+
+            robot.getChassisAssembly().setBackLeftWheelTargetPosition(newBackLeftTarget);
+            robot.getChassisAssembly().setBackRightWheelTargetPosition(newBackRightTarget);
+            robot.getChassisAssembly().setFrontLeftWheelTargetPosition(newFrontLeftTarget);
+            robot.getChassisAssembly().setFrontRightWeelTargetPosition(newFrontRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.getChassisAssembly().setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            robot.getChassisAssembly().setBackLeftWheelPower(Math.abs(speed));
+            robot.getChassisAssembly().setBackRightWheelPower(Math.abs(speed));
+            robot.getChassisAssembly().setFrontLeftWheelPower(Math.abs(speed));
+            robot.getChassisAssembly().setFrontRightWheelPower(Math.abs(speed));
+
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.getChassisAssembly().isBackLeftWheelBusy() && robot.getChassisAssembly().isBackRightWheelBusy() &&
+                            robot.getChassisAssembly().isFrontLeftWheelBusy() && robot.getChassisAssembly().isFrontRightWheelBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Path1",  "Running to %7d :%7d : %7d :%7d",
+                        newBackLeftTarget,  newBackRightTarget, newFrontLeftTarget, newFrontRightTarget);
+                telemetry.addData("Path2",  "Running at %7d :%7d : %7d : %7d",
+                        robot.getChassisAssembly().getBackLeftWheelCurrentPosition(),
+                        robot.getChassisAssembly().getBackRightWheelCurrentPosition(),
+                        robot.getChassisAssembly().getFrontLeftWheelCurrentPosition(),
+                        robot.getChassisAssembly().getFrontRightWheelCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.getChassisAssembly().stopMoving();
+
+            // Turn off RUN_TO_POSITION
+            robot.getChassisAssembly().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+    }//end of encoderDrive
 
 }

@@ -205,6 +205,6 @@ public class ChassisAssembly
      */
     public void setBackLeftWheelTargetPosition(int position) {robotHardware.backLeftWheel.setTargetPosition(position);}
     public void setBackRightWheelTargetPosition(int position) {robotHardware.backRightWheel.setTargetPosition(position);}
-    public void setFrontLeftWheelPosition(int position) {robotHardware.frontLeftWheel.setTargetPosition(position);}
-    public void setFrontRightWeelPosition(int position) {robotHardware.frontRightWheel.setTargetPosition(position);}
+    public void setFrontLeftWheelTargetPosition(int position) {robotHardware.frontLeftWheel.setTargetPosition(position);}
+    public void setFrontRightWeelTargetPosition(int position) {robotHardware.frontRightWheel.setTargetPosition(position);}
 }
