@@ -6,16 +6,19 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.sun.source.tree.WhileLoopTree;
+import com.vuforia.CameraDevice;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.ArrayList;
@@ -23,7 +26,10 @@ import java.util.List;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YXZ;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
+import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 
 @TeleOp(name="AutoTest2", group ="Qualifier")
@@ -65,7 +71,7 @@ public class AutonomousTest2 extends LinearOpMode
 
     //Vuforia
     private static final String VUFORIA_KEY = "AVsSQB3/////AAABGehU0OjxREoznvNKEBqbvmskci8syRYfMKE0XlaGnZpw68DAZV19s7dfqc0vWrY78bAO2Ym2n1T2rDvNBOVVbMWxXIRo2c18JH6/c2fcKT1bRKxsG7bYq69+n9IHmKedY6rmTU1VOZZdtSTXh7exMsl67IAcnCZ0/ec+P+ZMpkK5v4X8d27rbEigGqqHayGe1/lG2afzgcHY7QxjJ/x5O4yGmVVs8wdzdupke19U+M8Z/x0FcYIfTAHuXcaydEL+h/w/ppcuNarD2ggo2BxdWeOGLx5GOin1yruVfvDAazPEuI0m3yEwXQNZ4e0ar2G0jDCZpAJPJcJRRVttBMwPoAvzTwySUx3qI1eNSJRAH+bk";
-    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = FRONT;
+    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     VuforiaLocalizer vuforia;
     String startingLocation = "UNKNOWN";
     private OpenGLMatrix lastLocation = null;
@@ -104,12 +110,14 @@ public class AutonomousTest2 extends LinearOpMode
         telemetry.update();
         waitForStart();
 
-        moveFromLander(WHEEL_SPEED, 1);
+        moveFromLander(WHEEL_SPEED, 1.5);
 
         sleep(250);
 
         telemetry.addData("Ready" , "");
         telemetry.update();
+
+        boolean goldFound = false;
 
         while (opModeIsActive())
         {
@@ -118,13 +126,11 @@ public class AutonomousTest2 extends LinearOpMode
                 findTrackable(WHEEL_SPEED, "LEFT", 7);
                 telemetry.update();
                 identifyStartLoc();
+
             }
 
             if (gamepad1.b)
             {
-                alignToTrackable(WHEEL_SPEED, 180, 1);
-                telemetry.update();
-
                 //Print the location
                 telemetry.addData("X" , lastLocation.getTranslation().get(0));
                 telemetry.addData("Y", lastLocation.getTranslation().get(1));
@@ -134,25 +140,49 @@ public class AutonomousTest2 extends LinearOpMode
 
             if(gamepad1.x)
             {
-                turnToMineral();
-                goldLoc++;
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                sleep(2000);
+
+                goldFound = isGold(updatedRecognitions);
+                telemetry.addData("Gold Found" , goldFound);
+
+                if(goldFound == false)
+                {
+                    turnToMineral();
+                    goldLoc++;
+
+                    if (tfod != null) {
+                        tfod.activate();
+                    }
+
+                }
+                else
+                {
+                    encoderDrive(WHEEL_SPEED , 36 , 6);
+                    telemetry.addData("Gold Loc" , goldLoc);
+                    telemetry.update();
+                }
+
             }
 
             if(gamepad1.y)
             {
-                encoderDrive(WHEEL_SPEED , 55 , 6);
+                encoderDrive(WHEEL_SPEED , 36 , 6);
                 telemetry.addData("Gold Loc" , goldLoc);
+                telemetry.update();
             }
 
             if(gamepad1.right_bumper)
             {
 
-                    encoderTurn(WHEEL_SPEED , 90 , "RIGHT" , 2);
+                if(goldLoc == 2)
+                {
+                    encoderTurn(WHEEL_SPEED, 90, "RIGHT", 2);
 
                     sleep(2000);
 
                     runtime.reset();
-                    while(opModeIsActive() && runtime.seconds() < 4)
+                    while (opModeIsActive() && runtime.seconds() < 3)
                     {
                         robot.getChassisAssembly().moveLeft(0.2);
                     }
@@ -162,7 +192,7 @@ public class AutonomousTest2 extends LinearOpMode
                     sleep(2000);
 
                     runtime.reset();
-                    while(opModeIsActive() && runtime.seconds() < 0.4)
+                    while (opModeIsActive() && runtime.seconds() < 0.4)
                     {
                         robot.getChassisAssembly().moveRight(WHEEL_SPEED);
                     }
@@ -170,10 +200,128 @@ public class AutonomousTest2 extends LinearOpMode
 
                     sleep(2000);
 
-                    encoderDrive(WHEEL_SPEED , 15 , 5);
+                    encoderDrive(WHEEL_SPEED, 50, 5);
                     sleep(250);
 
-                    encoderDrive(WHEEL_SPEED , -80 , 10);
+                    encoderDrive(WHEEL_SPEED, -80, 10);
+                }
+
+                if(goldLoc == 1)
+                {
+                    encoderTurn(WHEEL_SPEED, 45, "RIGHT", 2);
+
+                    sleep(2000);
+
+                    runtime.reset();
+                    while (opModeIsActive() && runtime.seconds() < 3.5)
+                    {
+                        robot.getChassisAssembly().moveLeft(0.2);
+                    }
+
+                    robot.getChassisAssembly().stopMoving();
+
+                    sleep(2000);
+
+                    runtime.reset();
+                    while (opModeIsActive() && runtime.seconds() < 0.4)
+                    {
+                        robot.getChassisAssembly().moveRight(WHEEL_SPEED);
+                    }
+                    robot.getChassisAssembly().stopMoving();
+
+                    sleep(2000);
+
+                    encoderDrive(WHEEL_SPEED, 5, 5);
+                    sleep(250);
+
+                    encoderDrive(WHEEL_SPEED, -80, 10);
+                }
+
+                if(goldLoc == 0)
+                {
+                    encoderDrive(WHEEL_SPEED, -30, 10);
+                    sleep(2000);
+
+                    encoderTurn(WHEEL_SPEED , 125 , "LEFT" , 5);
+
+                    sleep(2000);
+
+                    encoderDrive(WHEEL_SPEED , 50 , 8);
+
+                    sleep(2000);
+
+                    encoderTurn(WHEEL_SPEED , 155 , "RIGHT" , 8);
+
+                    sleep(5000);
+
+                    runtime.reset();
+                    while (opModeIsActive() && runtime.seconds() < 2)
+                    {
+                        robot.getChassisAssembly().moveLeft(0.2);
+                    }
+
+                    robot.getChassisAssembly().stopMoving();
+
+                    sleep(2000);
+
+                    runtime.reset();
+                    while (opModeIsActive() && runtime.seconds() < 0.4)
+                    {
+                        robot.getChassisAssembly().moveRight(WHEEL_SPEED);
+                    }
+                    robot.getChassisAssembly().stopMoving();
+
+                    sleep(2000);
+
+                    encoderDrive(WHEEL_SPEED , 50 , 7);
+
+                    sleep(2000);
+
+                    encoderDrive(WHEEL_SPEED , -80 , 7);
+
+                }
+            }
+
+            while (gamepad1.left_bumper)
+            {
+                    for (VuforiaTrackable trackable : allTrackables)
+                    {
+                        telemetry.addData("Searching for Targets: " , targetVisible);
+
+                        if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible())
+                        {
+                            telemetry.addData("Visible Target", trackable.getName());
+                            foundTarget = trackable;
+                            targetVisible = true;
+
+                            OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
+                            if (robotLocationTransform != null)
+                            {
+                                lastLocation = robotLocationTransform;
+                            }
+                            break;
+                        }
+                    }
+
+                    if (targetVisible)
+                    {
+
+                        telemetry.addData("Target Found: " , targetVisible);
+                        telemetry.update();
+
+                        robot.getChassisAssembly().stopMoving();
+
+                        //Get the Translational Information in Inches
+                        translation = lastLocation.getTranslation();
+                        telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                                translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+
+                        //Get the Rotational Information in Degrees
+                        rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+                        telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+                    }
+
+                    telemetry.update();
             }
         }
     }
@@ -231,16 +379,15 @@ public class AutonomousTest2 extends LinearOpMode
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 270));
         backSpace.setLocation(backSpaceLocation);
 
-
-        //Phone Location
-        final int CAMERA_FORWARD_DISPLACEMENT  = 330; //camera is 216  mm in front of the robot center
-        final int CAMERA_VERTICAL_DISPLACEMENT = 102;
-        final int CAMERA_HORIZONTAL_DISPLACEMENT = -102; //camera is 51 mm to the left of the robot center
+        final int CAMERA_FORWARD_DISPLACEMENT  = 216 ;  // eg: Camera is 216 mm in front of robot center
+        final int CAMERA_VERTICAL_DISPLACEMENT = 121;   // eg: Camera is 178 mm above ground
+        final int CAMERA_LEFT_DISPLACEMENT     = 19;     // eg: Camera is 25 mm to the left from the robot's center line
 
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
-                .translation(CAMERA_HORIZONTAL_DISPLACEMENT, CAMERA_FORWARD_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES,
-                        90 , -90, 180));
+                .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES,
+                         -90, 0, -90));
+
 
         //Giving the phone location to all the trackables
         for (VuforiaTrackable trackable : allTrackables)
@@ -275,6 +422,8 @@ public class AutonomousTest2 extends LinearOpMode
     {
         runtime.reset();
 
+        encoderDrive(WHEEL_SPEED , 5 , 4);
+
         while(opModeIsActive() && runtime.seconds() < maxSeconds)
         {
             robot.getChassisAssembly().moveLeft(speed);
@@ -285,16 +434,61 @@ public class AutonomousTest2 extends LinearOpMode
     }
 
 
+    private boolean isGold(List<Recognition> updatedRecognitions)
+    {
+        for (Recognition recognition : updatedRecognitions)
+        {
+            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
+            {
+                telemetry.addData("gold Mineral, Position is: ", goldLoc);
+                telemetry.update();
+                int leftValue = (int) recognition.getLeft();
+                int rightvalue= (int) recognition.getRight();
+                int topvalue = (int) recognition.getTop();
+                int bottonvalue = (int) recognition.getBottom();
+                int imgWidth = (int) recognition.getConfidence();
+                int imgconfidence = (int) recognition.getImageWidth();
+                int angletoobject = (int) recognition.estimateAngleToObject(AngleUnit.DEGREES);
+                telemetry.addData("leftValue: " + leftValue
+                        + " rightvalue: " + rightvalue
+                        + " topvalue: " + topvalue
+                        + " bottonvalue: " + bottonvalue
+                        + " imgWidth: " + imgWidth
+                        + " imgconfidence" + imgconfidence
+                        + " angletoobject" + angletoobject , " gold mineral position data");
+                telemetry.update();
+
+                sleep(250);
+                return true;
+            }
+            else if(recognition.getLabel().equals(LABEL_SILVER_MINERAL));
+            {
+                if(goldLoc < 2)
+                {
+                    goldLoc++;
+                    telemetry.addData("Silver Mineral, Position is: ", goldLoc);
+                    telemetry.update();
+                }
+                else
+                {
+                    telemetry.addData("No Mineral, Position is: ", goldLoc);
+                    telemetry.update();
+                }
+                return false;
+            }
+        }
+
+        return  false;
+    }//end of isGold
+
     /**
      * FIND TRACKABLE METHOD
      */
     private void findTrackable(double speed, String direction, double turnSeconds)
     {
         runtime.reset();
-
-        encoderTurn(WHEEL_SPEED , 25 , "LEFT" , 5);
-
-        while(opModeIsActive() && targetVisible==false && runtime.seconds() < turnSeconds)
+        CameraDevice.getInstance().setFlashTorchMode(true) ;
+        while(opModeIsActive() && targetVisible==false)
         {
             for (VuforiaTrackable trackable : allTrackables)
             {
@@ -331,13 +525,48 @@ public class AutonomousTest2 extends LinearOpMode
                 //Get the Rotational Information in Degrees
                 rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+                CameraDevice.getInstance().setFlashTorchMode(false) ;
                 break;
             }
             else
             {
                 telemetry.addData("Visible Target", "none");
                 telemetry.update();
+
+                if(direction == "LEFT")
+                {
+                    robot.getChassisAssembly().turnLeft(speed);
+                }
+                else if(direction == "RIGHT")
+                {
+                    robot.getChassisAssembly().turnRight(speed);
+                }
+                else
+                {
+                    robot.getChassisAssembly().stopMoving();
+                    telemetry.addData("INVALID DIRECTION" , direction);
+                    telemetry.update();
+                }
+                sleep(200);
             }
+
+            robot.getChassisAssembly().stopMoving();
+            sleep(300);
+
+            if(runtime.seconds() > turnSeconds)
+            {
+                runtime.reset();
+
+                if(direction == "LEFT")
+                {
+                    direction = "RIGHT";
+                }
+                else if(direction == "RIGHT")
+                {
+                    direction = "LEFT";
+                }
+            }
+
         }
 
         //Now that the target is visible, stop moving
@@ -399,7 +628,7 @@ public class AutonomousTest2 extends LinearOpMode
         rotation = Orientation.getOrientation(lastLocation , EXTRINSIC , XYZ , DEGREES);
 
 
-        robotAngle = Math.abs(rotation.thirdAngle) - 180;
+        robotAngle = angle - targetAngle;
 
 
         sleep(250);
@@ -411,6 +640,15 @@ public class AutonomousTest2 extends LinearOpMode
      */
     private void identifyStartLoc()
     {
+        double angle = rotation.thirdAngle;
+        double targetAngle = 0;
+
+        if(angle < 0)
+        {
+            angle = angle + 360;
+        }
+
+
         if (translation.get(0) > 0 && translation.get(1) > 0)
         {
             startingLocation = "BLUE_CRATER";
@@ -420,26 +658,27 @@ public class AutonomousTest2 extends LinearOpMode
             startingLocation = "BLUE_DEPOT";
         }
         else if (translation.get(0) > 0 && translation.get(1) < 0)
-            {
-                startingLocation = "RED_DEPOT";
+        {
+            startingLocation = "RED_DEPOT";
 
-                //Setting the Positions of the Minerals
-                LeftMineralLoc = OpenGLMatrix
-                        .translation(24 * mmPerInch,-48 * mmPerInch ,0 );
-                CenterMineralLoc = OpenGLMatrix
-                        .translation(36 * mmPerInch,-36 * mmPerInch ,0 );
-                RightMineralLoc = OpenGLMatrix
-                        .translation(48 * mmPerInch,-24 * mmPerInch ,0 );
-            }
-            else if (translation.get(0) < 0 && translation.get(1) < 0)
-                {
-                    startingLocation = "RED_CRATER";
-                }
+            //Setting the Positions of the Minerals
+            LeftMineralLoc = OpenGLMatrix
+                    .translation(24 * mmPerInch,-48 * mmPerInch ,0 );
+            CenterMineralLoc = OpenGLMatrix
+                    .translation(36 * mmPerInch,-36 * mmPerInch ,0 );
+            RightMineralLoc = OpenGLMatrix
+                    .translation(48 * mmPerInch,-24 * mmPerInch ,0 );
 
-        telemetry.addData("StartingLocation: ", startingLocation);
-        telemetry.addData("Angle: " , rotation.thirdAngle);
+            targetAngle = 270;
 
-        telemetry.update();
+
+        }
+        else if (translation.get(0) < 0 && translation.get(1) < 0)
+        {
+            startingLocation = "RED_CRATER";
+        }
+
+        robotAngle = angle - targetAngle;
     }
 
     /**
@@ -472,18 +711,33 @@ public class AutonomousTest2 extends LinearOpMode
         {
             mineralX = RightMineralLoc.getTranslation().get(0);
             mineralY = RightMineralLoc.getTranslation().get(1);
-            angleToTurn=45;
+            angleToTurn = 55;
         }
 
         //Now to find the Angle to Turn
-        /*
+
         double angle;
         double division = Math.abs(mineralX-robotX) / Math.abs(mineralY - robotY);
 
         angle = Math.atan(division);
         angle = Math.toDegrees(angle);
 
-        double angleToTurn = angle - robotAngle;
+        angleToTurn = angle - robotAngle;
+
+        double offset = 0;
+
+
+        if(goldLoc == 0)
+        {
+            offset = 10;
+        }
+
+        if(goldLoc == 1)
+        {
+            offset = 15;
+        }
+
+        angleToTurn = angleToTurn + offset;
 
         telemetry.addData("Robot X" , robotX);
         telemetry.addData("Robot Y" , robotY);
@@ -497,10 +751,6 @@ public class AutonomousTest2 extends LinearOpMode
         encoderTurn(WHEEL_SPEED , angleToTurn , "LEFT" , 2);
 
         robotAngle = angle;
-        */
-
-        encoderTurn(WHEEL_SPEED , angleToTurn , "LEFT" , 2);
-
 
     }
 

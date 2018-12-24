@@ -104,8 +104,8 @@ public class TestTurnEncoder extends LinearOpMode
 
             roverRuckusBot.getChassisAssembly().setBackLeftWheelTargetPosition(newBackLeftTarget);
             roverRuckusBot.getChassisAssembly().setBackRightWheelTargetPosition(newBackRightTarget);
-            roverRuckusBot.getChassisAssembly().setFrontLeftWheelPosition(newFrontLeftTarget);
-            roverRuckusBot.getChassisAssembly().setFrontRightWeelPosition(newFrontRightTarget);
+            roverRuckusBot.getChassisAssembly().setFrontLeftWheelTargetPosition(newFrontLeftTarget);
+            roverRuckusBot.getChassisAssembly().setFrontRightWeelTargetPosition(newFrontRightTarget);
 
             // Turn On RUN_TO_POSITION
             roverRuckusBot.getChassisAssembly().setMode(DcMotor.RunMode.RUN_TO_POSITION);
