@@ -72,11 +72,11 @@ public class TeleOpMode extends LinearOpMode
             //Extending the Deposit
             if(gamepad1.dpad_right)
             {
-                roverRuckusBot.getArmAssembly().extendDeposit(0.7);
+                roverRuckusBot.getArmAssembly().extendDeposit(1);
             }
             else if(gamepad1.dpad_left)
             {
-                roverRuckusBot.getArmAssembly().retractDeposit(0.7);
+                roverRuckusBot.getArmAssembly().retractDeposit(1);
             }
             else
             {

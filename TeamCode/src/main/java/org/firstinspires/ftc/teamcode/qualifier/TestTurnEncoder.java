@@ -17,7 +17,7 @@ public class TestTurnEncoder extends LinearOpMode
     final double WHEEL_DIAMETER_INCHES = 4.0;
  //   final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
          //   (WHEEL_DIAMETER_INCHES * 3.1415);
-    final double COUNTS_PER_DEGREE = 14.5;
+    final double COUNTS_PER_SIDE_INCH = 100;
 
     private RoverRobot roverRuckusBot = new RoverRobot();
     ElapsedTime runtime = new ElapsedTime();
@@ -32,23 +32,33 @@ public class TestTurnEncoder extends LinearOpMode
         telemetry.update();
         waitForStart();
 
-        double blPos = roverRuckusBot.getChassisAssembly().getBackLeftWheelCurrentPosition();
-        double brPos = roverRuckusBot.getChassisAssembly().getBackRightWheelCurrentPosition();
-        double frPos = roverRuckusBot.getChassisAssembly().getFrontRightWheelCurrentPosition();
-        double flPos = roverRuckusBot.getChassisAssembly().getFrontLeftWheelCurrentPosition();
+        double blPos;
+        double brPos;
+        double frPos;
+        double flPos;
 
-        telemetry.addData("Starting Positions:" , "");
+
+        blPos = roverRuckusBot.getChassisAssembly().getBackLeftWheelCurrentPosition();
+        brPos = roverRuckusBot.getChassisAssembly().getBackRightWheelCurrentPosition();
+        frPos = roverRuckusBot.getChassisAssembly().getFrontRightWheelCurrentPosition();
+        flPos = roverRuckusBot.getChassisAssembly().getFrontLeftWheelCurrentPosition();
+
+        telemetry.addData("Current Positions:" , "");
         telemetry.addData("Back Left: " , blPos);
         telemetry.addData("Back Right: " , brPos);
         telemetry.addData("Front Left" , flPos);
         telemetry.addData("Front Right" , frPos);
         telemetry.update();
-        sleep(1000);
+        sleep(8000);
 
-        //Moving the Robot
-        encoderDrive(0.4 , 180 , 2);
+        encoderSide(0.4 , 24 , "LEFT" , 5);
 
-        sleep(5000);
+
+        blPos = roverRuckusBot.getChassisAssembly().getBackLeftWheelCurrentPosition();
+        brPos = roverRuckusBot.getChassisAssembly().getBackRightWheelCurrentPosition();
+        frPos = roverRuckusBot.getChassisAssembly().getFrontRightWheelCurrentPosition();
+        flPos = roverRuckusBot.getChassisAssembly().getFrontLeftWheelCurrentPosition();
+
         telemetry.addData("Current Positions:" , "");
         telemetry.addData("Back Left: " , blPos);
         telemetry.addData("Back Right: " , brPos);
@@ -58,33 +68,12 @@ public class TestTurnEncoder extends LinearOpMode
         sleep(8000);
 
 
-        /*while (opModeIsActive())
-        {
-            if(gamepad1.a)
-            {
-                roverRuckusBot.getChassisAssembly().turnLeft(0.4);
-                blPos = roverRuckusBot.getChassisAssembly().getBackLeftWheelCurrentPosition();
-                brPos = roverRuckusBot.getChassisAssembly().getBackRightWheelCurrentPosition();
-                frPos = roverRuckusBot.getChassisAssembly().getFrontRightWheelCurrentPosition();
-                flPos = roverRuckusBot.getChassisAssembly().getFrontLeftWheelCurrentPosition();
 
-                telemetry.addData("Current Positions:" , "");
-                telemetry.addData("Back Left: " , blPos);
-                telemetry.addData("Back Right: " , brPos);
-                telemetry.addData("Front Left" , flPos);
-                telemetry.addData("Front Right" , frPos);
-                telemetry.update();
-            }
-            else
-            {
-                roverRuckusBot.getChassisAssembly().stopMoving();
-            }
-        }
-        */
+
     }
 
 
-    public void encoderDrive(double speed, double degrees, double timeoutS)
+    public void encoderSide(double speed, double inches, String direction , double timeoutS)
     {
         int newBackLeftTarget;
         int newBackRightTarget;
@@ -95,11 +84,20 @@ public class TestTurnEncoder extends LinearOpMode
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newBackLeftTarget = roverRuckusBot.getChassisAssembly().getBackLeftWheelCurrentPosition() + (int)(-degrees * COUNTS_PER_DEGREE);
-            newBackRightTarget = roverRuckusBot.getChassisAssembly().getBackRightWheelCurrentPosition() + (int)(degrees * COUNTS_PER_DEGREE);
-            newFrontLeftTarget = roverRuckusBot.getChassisAssembly().getFrontLeftWheelCurrentPosition() + (int)(-degrees * COUNTS_PER_DEGREE);
-            newFrontRightTarget = roverRuckusBot.getChassisAssembly().getFrontRightWheelCurrentPosition() + (int)(degrees * COUNTS_PER_DEGREE);
-
+            if(direction == "RIGHT")
+            {
+                newBackLeftTarget = roverRuckusBot.getChassisAssembly().getBackLeftWheelCurrentPosition() + (int) (-inches * COUNTS_PER_SIDE_INCH);
+                newBackRightTarget = roverRuckusBot.getChassisAssembly().getBackRightWheelCurrentPosition() + (int) (inches * COUNTS_PER_SIDE_INCH);
+                newFrontLeftTarget = roverRuckusBot.getChassisAssembly().getFrontLeftWheelCurrentPosition() + (int) (inches * COUNTS_PER_SIDE_INCH);
+                newFrontRightTarget = roverRuckusBot.getChassisAssembly().getFrontRightWheelCurrentPosition() + (int) (-inches * COUNTS_PER_SIDE_INCH);
+            }
+            else
+            {
+                newBackLeftTarget = roverRuckusBot.getChassisAssembly().getBackLeftWheelCurrentPosition() + (int) (inches * COUNTS_PER_SIDE_INCH);
+                newBackRightTarget = roverRuckusBot.getChassisAssembly().getBackRightWheelCurrentPosition() + (int) (-inches * COUNTS_PER_SIDE_INCH);
+                newFrontLeftTarget = roverRuckusBot.getChassisAssembly().getFrontLeftWheelCurrentPosition() + (int) (-inches * COUNTS_PER_SIDE_INCH);
+                newFrontRightTarget = roverRuckusBot.getChassisAssembly().getFrontRightWheelCurrentPosition() + (int) (inches * COUNTS_PER_SIDE_INCH);
+            }
 
 
             roverRuckusBot.getChassisAssembly().setBackLeftWheelTargetPosition(newBackLeftTarget);

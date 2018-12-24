@@ -28,7 +28,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
 @Autonomous(name="Auto2", group ="Qualifier")
-public class AutonomousMode2 extends LinearOpMode
+public class Autonomous2 extends LinearOpMode
 {
     //TFod
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -193,8 +193,8 @@ public class AutonomousMode2 extends LinearOpMode
         backSpace.setLocation(backSpaceLocation);
 
         final int CAMERA_FORWARD_DISPLACEMENT  = 216 ;  // eg: Camera is 216 mm in front of robot center
-        final int CAMERA_VERTICAL_DISPLACEMENT = 121;   // eg: Camera is 178 mm above ground
-        final int CAMERA_LEFT_DISPLACEMENT     = 19;     // eg: Camera is 25 mm to the left from the robot's center line
+        final int CAMERA_VERTICAL_DISPLACEMENT = 121;   // eg: Camera is 121 mm above ground
+        final int CAMERA_LEFT_DISPLACEMENT     = 19;     // eg: Camera is 19 mm to the left from the robot's center line
 
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
