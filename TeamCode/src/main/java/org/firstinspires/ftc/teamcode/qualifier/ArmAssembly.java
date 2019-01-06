@@ -19,6 +19,11 @@ public class ArmAssembly
         robotHardware = hardware;
     }
 
+    protected void resetGrabber()
+    {
+        robotHardware.intakeSlides.resetDeviceConfigurationForOpMode();
+        robotHardware.intakeSlides.setPower(0.0);
+    }
 
     protected void extendGrabber(double speed)
     {
@@ -27,6 +32,7 @@ public class ArmAssembly
 
     protected void retractGrabber(double speed)
     {
+
         robotHardware.intakeSlides.setPower(-speed);
     }
 
@@ -49,6 +55,26 @@ public class ArmAssembly
     protected void stopDepositExtension()
     {
         robotHardware.deliveryLift.setPower(0);
+    }
+
+    protected void intakeMineral(double speed)
+    {
+        robotHardware.intakeMineral.setPower(speed);
+    }
+
+    protected void outTakeMineral(double speed)
+    {
+        robotHardware.intakeMineral.setPower(-speed);
+    }
+
+    protected void stopIntake()
+    {
+        robotHardware.intakeMineral.setPower(0);
+    }
+
+    protected void flip (double position)
+    {
+        robotHardware.flipper.setPosition(position);
     }
 
 }

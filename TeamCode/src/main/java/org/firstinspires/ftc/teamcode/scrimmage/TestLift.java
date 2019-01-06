@@ -2,12 +2,14 @@
  */
 package org.firstinspires.ftc.teamcode.scrimmage;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 @TeleOp(name="TestNavigation", group ="Tests")
+@Disabled
 public class TestLift extends LinearOpMode {
 
     //Declare Hardware

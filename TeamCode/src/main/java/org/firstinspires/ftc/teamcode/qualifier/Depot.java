@@ -145,6 +145,8 @@ public class Depot extends LinearOpMode
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
+            robot.getChassisAssembly().changeToEncoderMode();
+
             // Determine new target position, and pass to motor controller
             newBackLeftTarget = robot.getChassisAssembly().getBackLeftWheelCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
             newBackRightTarget = robot.getChassisAssembly().getBackRightWheelCurrentPosition() - (int)(inches * COUNTS_PER_INCH);

@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.scrimmage;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -48,6 +49,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="TestDrop", group="Scrimage")
+@Disabled
 public class TestDrop extends LinearOpMode {
 
     // Declare OpMode members.

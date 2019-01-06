@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.scrimmage;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -65,6 +66,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 
 @Autonomous(name="Autonomous", group ="Scrimmage")
+@Disabled
 public class AutonomousMode extends LinearOpMode
 {
     //TFod

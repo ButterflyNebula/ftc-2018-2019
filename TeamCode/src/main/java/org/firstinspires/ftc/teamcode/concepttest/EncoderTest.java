@@ -1,11 +1,15 @@
-package org.firstinspires.ftc.teamcode.qualifier;
+package org.firstinspires.ftc.teamcode.concepttest;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="EncoderTest2", group ="Tests")
+import org.firstinspires.ftc.teamcode.qualifier.RoverRobot;
+
+@TeleOp(name="EncoderTest2", group ="ConceptTests")
+@Disabled
 public class EncoderTest extends LinearOpMode
 {
 

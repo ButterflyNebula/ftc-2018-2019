@@ -93,8 +93,6 @@ public class AutonomousTest2 extends LinearOpMode
 
         //Setup Vuforia
         initVuforia();
-
-
         //Setup TFod
         if (ClassFactory.getInstance().canCreateTFObjectDetector())
         {

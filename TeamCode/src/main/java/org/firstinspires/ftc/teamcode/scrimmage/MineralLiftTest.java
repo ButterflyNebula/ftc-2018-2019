@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.scrimmage;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp (name = "Mineral Lift Test")
-
+@Disabled
 public class MineralLiftTest extends LinearOpMode {
     private RoverRobot roverRuckusBot = new RoverRobot();
 

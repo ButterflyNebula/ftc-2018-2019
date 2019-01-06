@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode.scrimmage;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -52,6 +53,7 @@ import java.util.List;
  * is explained below.
  */
 @TeleOp(name = "Test Mineral Detection", group = "Test")
+@Disabled
 
 public class TestMineralDetection extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";

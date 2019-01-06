@@ -7,8 +7,9 @@ package org.firstinspires.ftc.teamcode.qualifier;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 public class RobotHardware
@@ -21,11 +22,14 @@ public class RobotHardware
 
     //Lift
     public DcMotor robotLift = null;
+    public DigitalChannel topTouch = null;
 
     //Arm
     public CRServo intakeSlides = null;
     public DcMotor deliveryLift = null;
     public DcMotor mineralWrist = null;
+    public DcMotor intakeMineral = null;
+    public Servo flipper = null;
 
     //Adding the Hardware Map
     private HardwareMap hwMap  = null;
@@ -50,16 +54,21 @@ public class RobotHardware
         backRightWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
 
 
-        //Initialize the lift motor and lock
+        //Initialize the lift motor and sensors
         robotLift = hwMap.get(DcMotor.class, "robotLift");
         robotLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robotLift.setDirection(DcMotor.Direction.FORWARD);
+        topTouch = hwMap.get(DigitalChannel.class, "topTouch");
 
 
         //Arm
         intakeSlides = hwMap.get(CRServo.class , "intakeSlides");
         deliveryLift = hwMap.get(DcMotor.class , "deliveryLift");
         mineralWrist = hwMap.get(DcMotor.class , "mineralWrist");
+        intakeMineral = hwMap.get(DcMotor.class , "intakeMotor");
+        intakeMineral.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMineral.setDirection(DcMotor.Direction.FORWARD);
+        flipper = hwMap.get(Servo.class, "flipper");
 
     }
 
