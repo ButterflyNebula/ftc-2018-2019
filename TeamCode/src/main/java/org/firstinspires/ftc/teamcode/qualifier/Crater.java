@@ -488,11 +488,11 @@ public class Crater extends LinearOpMode
 
         if(goldLoc == -1)
         {
-            distanceToWall = 60;
+            distanceToWall = 56;
         }
         else if(goldLoc == 0)
         {
-            distanceToWall = 36;
+            distanceToWall = 32;
         }
         else
         {
@@ -501,7 +501,7 @@ public class Crater extends LinearOpMode
 
         encoderDrive(WHEEL_SPEED , distanceToWall , 7);
 
-        encoderTurn(WHEEL_SPEED , 55 , "LEFT" , 5);
+        encoderTurn(WHEEL_SPEED , 65 , "LEFT" , 5);
 
         wallAlign();
 

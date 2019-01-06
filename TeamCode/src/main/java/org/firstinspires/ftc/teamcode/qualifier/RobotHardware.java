@@ -64,6 +64,7 @@ public class RobotHardware
         //Arm
         intakeSlides = hwMap.get(CRServo.class , "intakeSlides");
         deliveryLift = hwMap.get(DcMotor.class , "deliveryLift");
+        deliveryLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         mineralWrist = hwMap.get(DcMotor.class , "mineralWrist");
         intakeMineral = hwMap.get(DcMotor.class , "intakeMotor");
         intakeMineral.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
