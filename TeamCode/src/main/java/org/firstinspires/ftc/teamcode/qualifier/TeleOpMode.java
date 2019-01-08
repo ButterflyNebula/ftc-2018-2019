@@ -149,11 +149,11 @@ public class TeleOpMode extends LinearOpMode
             //Flip
             if(flip)
             {
-                roverRuckusBot.getArmAssembly().flip(1);
+                roverRuckusBot.getArmAssembly().flip(0.1);
             }
-            else
+            else if (gamepad2.a)
             {
-                roverRuckusBot.getArmAssembly().flip(0);
+                roverRuckusBot.getArmAssembly().flip(0.9);
             }
 
 
