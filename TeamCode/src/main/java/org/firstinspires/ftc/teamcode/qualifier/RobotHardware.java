@@ -25,9 +25,9 @@ public class RobotHardware
     public DigitalChannel topTouch = null;
 
     //Arm
-    public CRServo intakeSlides = null;
+    public DcMotor intakeSlides = null;
     public DcMotor deliveryLift = null;
-    public DcMotor mineralWrist = null;
+    public CRServo mineralWrist = null;
     public DcMotor intakeMineral = null;
     public Servo flipper = null;
 
@@ -62,10 +62,10 @@ public class RobotHardware
 
 
         //Arm
-        intakeSlides = hwMap.get(CRServo.class , "intakeSlides");
+        intakeSlides = hwMap.get(DcMotor.class , "intakeSlides");
         deliveryLift = hwMap.get(DcMotor.class , "deliveryLift");
         deliveryLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        mineralWrist = hwMap.get(DcMotor.class , "mineralWrist");
+        mineralWrist = hwMap.get(CRServo.class , "mineralWrist");
         intakeMineral = hwMap.get(DcMotor.class , "intakeMotor");
         intakeMineral.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMineral.setDirection(DcMotor.Direction.FORWARD);
