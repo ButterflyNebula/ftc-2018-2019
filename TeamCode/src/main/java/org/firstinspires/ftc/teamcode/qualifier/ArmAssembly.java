@@ -77,4 +77,26 @@ public class ArmAssembly
         robotHardware.flipper.setPosition(position);
     }
 
+    protected void moveWrist (double power)
+    {
+        robotHardware.mineralWrist.setPower(power);
+    }
+
+    /**
+     * CR SERVO LIFT CONTROL
+     */
+    protected void deliveryUp()
+    {
+        robotHardware.deliveryLiftServo.setPower(0.8);
+    }
+    protected void deliverDown()
+    {
+        robotHardware.deliveryLiftServo.setPower(-0.8);
+    }
+    protected void deliveryStop()
+    {
+        robotHardware.deliveryLiftServo.setPower(0.004);
+    }
+
+
 }

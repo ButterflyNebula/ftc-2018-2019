@@ -30,7 +30,12 @@ public class RobotHardware
     public CRServo mineralWrist = null;
     public DcMotor intakeMineral = null;
     public Servo flipper = null;
+    public DigitalChannel wristTouch = null;
+    public DigitalChannel backTouch = null;
+    public DigitalChannel deliveryTouch = null;
 
+
+    public CRServo deliveryLiftServo = null;
     //Adding the Hardware Map
     private HardwareMap hwMap  = null;
 
@@ -70,6 +75,12 @@ public class RobotHardware
         intakeMineral.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMineral.setDirection(DcMotor.Direction.FORWARD);
         flipper = hwMap.get(Servo.class, "flipper");
+        wristTouch = hwMap.get(DigitalChannel.class, "wristTouch");
+        backTouch = hwMap.get(DigitalChannel.class, "backTouch");
+        deliveryTouch = hwMap.get(DigitalChannel.class, "deliveryTouch");
+
+        deliveryLiftServo = hwMap.get(CRServo.class , "deliveryServo");
+
 
     }
 
