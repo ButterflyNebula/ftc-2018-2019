@@ -87,11 +87,11 @@ public class Crater extends LinearOpMode
         moveFromLander();
 
         hitGold();
-/*
+
         placeMarker();
 
         parkInCrater();
-        */
+
 
     }
 
@@ -432,7 +432,7 @@ public class Crater extends LinearOpMode
                     telemetry.addData("Moving Right" , "");
                     telemetry.update();
                     //Move to Position -1
-                    encoderSide(WHEEL_SPEED , 15 , "RIGHT" , 5);
+                    encoderSide(WHEEL_SPEED , 17 , "RIGHT" , 5);
                     goldLoc = -1;
                 }
                 else if(goldLoc == -1)
@@ -488,24 +488,30 @@ public class Crater extends LinearOpMode
 
         if(goldLoc == -1)
         {
-            distanceToWall = 56;
+            distanceToWall = 60;
         }
         else if(goldLoc == 0)
         {
-            distanceToWall = 32;
+            distanceToWall = 36;
         }
         else
         {
-            distanceToWall = 12;
+            distanceToWall = 24;
         }
+
 
         encoderDrive(WHEEL_SPEED , distanceToWall , 7);
 
-        encoderTurn(WHEEL_SPEED , 65 , "LEFT" , 5);
+        encoderTurn(WHEEL_SPEED , 60 , "LEFT" , 5);
+
+        encoderSide(WHEEL_SPEED , 12, "RIGHT" , 5);
 
         wallAlign();
 
         encoderDrive(WHEEL_SPEED , distanceToDepot , 5);
+
+        releaseMarker();
+
 
     }//end of Place Marker
 
@@ -520,8 +526,33 @@ public class Crater extends LinearOpMode
     }//end of wall Align
 
 
+    /**
+     * PARK IN CRATER
+     */
     private void parkInCrater()
     {
         encoderDrive(WHEEL_SPEED , distanceToCrater , 5);
-    }
+    }//end of parkInCrater
+
+    /**
+     * RELEASE MARKER
+     */
+    private void releaseMarker()
+    {
+        runtime.reset();
+
+        while(opModeIsActive() && runtime.seconds() < 1)
+        {
+            robot.getArmAssembly().extendDeposit(0.4);
+        }
+        robot.getArmAssembly().stopDepositExtension();
+        sleep(250);
+
+        robot.getArmAssembly().flip(0.9);
+        sleep(2000);
+
+        robot.getArmAssembly().flip(0.2);
+    }//end of release marker
+
+
 }

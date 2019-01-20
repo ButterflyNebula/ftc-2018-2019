@@ -65,7 +65,7 @@ public class Depot extends LinearOpMode
     //Creating a Rover robot object
     RoverRobot robot = new RoverRobot();
 
-    private static final double WHEEL_SPEED = 0.7;
+    private static final double WHEEL_SPEED = 1;
     private ElapsedTime runtime = new ElapsedTime();
 
 
@@ -491,6 +491,8 @@ public class Depot extends LinearOpMode
         wallAlign();
 
         encoderDrive(WHEEL_SPEED , distanceToDepot , 5);
+
+        releaseMarker();
     }//end of Place Marker
 
     /**
@@ -508,6 +510,23 @@ public class Depot extends LinearOpMode
     {
         encoderDrive(WHEEL_SPEED , distanceToCrater , 5);
     }
+
+    private void releaseMarker()
+    {
+        runtime.reset();
+
+        while(opModeIsActive() && runtime.seconds() < 1)
+        {
+            robot.getArmAssembly().extendDeposit(0.4);
+        }
+        robot.getArmAssembly().stopDepositExtension();
+        sleep(250);
+
+        robot.getArmAssembly().flip(0.9);
+        sleep(2000);
+
+        robot.getArmAssembly().flip(0.2);
+    }//end of release marker
 
 
 }
