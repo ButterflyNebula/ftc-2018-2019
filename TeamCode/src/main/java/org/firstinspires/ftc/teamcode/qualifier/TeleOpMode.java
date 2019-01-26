@@ -11,15 +11,14 @@ public class TeleOpMode extends LinearOpMode {
     private static final double LIFT_UP_SPEED = 0.6;
     private static final double LIFT_DOWN_SPEED = 1.0;
 
-    double power = 0.2;
-
+    boolean intakeOn = false;
     //Creating a Rover robot object
     RoverRobot roverRuckusBot = new RoverRobot();
 
     private ElapsedTime runtime = new ElapsedTime();
 
     boolean isDelivServoUpPressed  = false;
-    boolean flipState              = false;
+    double flipPos = 0.09;
 
     @Override
     public void runOpMode() {
@@ -40,8 +39,9 @@ public class TeleOpMode extends LinearOpMode {
             boolean lowerRobot = gamepad1.dpad_down;
             boolean intake = gamepad1.x;
             boolean outtake = gamepad1.b;
-            boolean wristUp        = gamepad1.y;
-            boolean wristDown      = gamepad1.a;
+            double manualFlip = gamepad1.right_stick_y;
+            boolean terminate = gamepad1.y;
+
 
             /**
              * GAME PAD 2
@@ -51,10 +51,12 @@ public class TeleOpMode extends LinearOpMode {
             boolean retractGrabber = gamepad2.dpad_left;
             boolean extendDeposit  = gamepad2.dpad_up;
             boolean retractDeposit = gamepad2.dpad_down;
-            boolean delivServoUp   = gamepad2.x;
-            boolean delivServoDown = gamepad2.b;
-            boolean flip           = gamepad2.a ;
-            boolean wristAutomate  = gamepad2.y;
+            boolean flip           = gamepad2.x;
+            boolean wristDown = gamepad2.a;
+            boolean wristReturn = gamepad2.y;
+            float manualWristDown = gamepad2.right_trigger;
+            float manualWristUp = gamepad2.left_trigger;
+            boolean depositReturn = gamepad2.b;
 
 
 
@@ -107,11 +109,14 @@ public class TeleOpMode extends LinearOpMode {
                 roverRuckusBot.getLiftAssembly().resetLift();
             }
 
-            if (intake) {
-                roverRuckusBot.getArmAssembly().intakeMineral(1.0);
-            } else if (outtake) {
+
+            if (outtake) {
                 roverRuckusBot.getArmAssembly().outTakeMineral(1.0);
-            } else {
+            }
+            else if (intake || intakeOn) {
+                roverRuckusBot.getArmAssembly().intakeMineral(1.0);
+            }
+             else {
                 roverRuckusBot.getArmAssembly().stopIntake();
             }
 
@@ -119,103 +124,368 @@ public class TeleOpMode extends LinearOpMode {
             //Sliding Out the Grabber
             if (extendGrabber) {
                 roverRuckusBot.getArmAssembly().extendGrabber(0.8);
-            } else if (retractGrabber) {
+            }
+            //Retracting the Grabber (Manually)
+            else if (retractGrabber && roverRuckusBot.getArmAssembly().robotHardware.backTouch.getState()) {
                 roverRuckusBot.getArmAssembly().retractGrabber(0.8);
             } else {
                 roverRuckusBot.getArmAssembly().stopGrabberExtension();
             }
 
             //Extending the Deposit
-            if (extendDeposit) {
+            if (extendDeposit)
+            {
+                intakeOn = false;
+                roverRuckusBot.getArmAssembly().stopIntake();
+
                 roverRuckusBot.getArmAssembly().extendDeposit(1);
-            } else if (retractDeposit) {
+            }
+            //Retracting the Deposit (Manually)
+            else if (retractDeposit && roverRuckusBot.getArmAssembly().robotHardware.deliveryTouch.getState()==true)
+            //not touching the sensor at the bottom of the lift
+            {
+                roverRuckusBot.getArmAssembly().flip(0.09);
                 roverRuckusBot.getArmAssembly().retractDeposit(1);
             } else {
                 roverRuckusBot.getArmAssembly().stopDepositExtension();
             }
-/*
-            //Flip
-            if (flip && roverRuckusBot.getArmAssembly().robotHardware.deliveryTouch.getState() == true) {
-                roverRuckusBot.getArmAssembly().flip(0.7);
-                flipState = true;
-            } else if (flip && flipState == true) {
-                while (roverRuckusBot.getArmAssembly().robotHardware.deliveryTouch.getState() == false) {
-                    roverRuckusBot.getArmAssembly().retractDeposit(1.0);
+
+
+            //Retracting the Deposit (Automatically)
+            if(depositReturn)
+            {
+                roverRuckusBot.getArmAssembly().flip(0.09);
+                flipPos = 0.09;
+
+                while(opModeIsActive() && roverRuckusBot.getArmAssembly().robotHardware.deliveryTouch.getState() && !terminate)
+                {
+                    terminate = gamepad1.y;
+
+                    roverRuckusBot.getArmAssembly().retractDeposit(1);
+
+
+                    //Movement
+                    drive = gamepad1.left_stick_y;
+                    turn = gamepad1.left_stick_x;
+                    sideRight = gamepad1.right_trigger;
+                    sideLeft = gamepad1.left_trigger;
+                    extendGrabber  = gamepad2.dpad_up;
+                    retractGrabber = gamepad2.dpad_down;
+
+
+                    if (drive > 0) {
+                        roverRuckusBot.getChassisAssembly().moveForward(-WHEEL_SPEED * drive);
+                    }
+                    //backwards
+                    else if (drive < 0) {
+                        roverRuckusBot.getChassisAssembly().moveBackwards(WHEEL_SPEED * drive);
+                    }
+                    //turn right
+                    else if (turn > 0) {
+                        roverRuckusBot.getChassisAssembly().turnRight(WHEEL_SPEED * turn);
+                    }
+                    //turn left
+                    else if (turn < 0) {
+                        roverRuckusBot.getChassisAssembly().turnLeft(WHEEL_SPEED * -turn);
+                    }
+                    //side right
+                    else if (sideRight > 0) {
+                        roverRuckusBot.getChassisAssembly().moveRight(-WHEEL_SPEED * sideRight);
+                    }
+                    //side left
+                    else if (sideLeft > 0) {
+                        roverRuckusBot.getChassisAssembly().moveLeft(-WHEEL_SPEED * sideLeft);
+                    }
+                    //stop moving
+                    else {
+                        roverRuckusBot.getChassisAssembly().stopMoving();
+                    }
+
+                    //Sliding Out the Grabber
+                    if (extendGrabber) {
+                        roverRuckusBot.getArmAssembly().extendGrabber(0.8);
+                    } else if (retractGrabber) {
+                        roverRuckusBot.getArmAssembly().retractGrabber(0.8);
+                    } else {
+                        roverRuckusBot.getArmAssembly().stopGrabberExtension();
+                    }
+
                 }
-                roverRuckusBot.getArmAssembly().stopGrabberExtension();
-                roverRuckusBot.getArmAssembly().flip(0.1);
-                flipState = false;
+                roverRuckusBot.getArmAssembly().stopDepositExtension();
             }
 
-*/
-
+            //Flipping to Deposit the Minerals
             if (flip) {
                 roverRuckusBot.getArmAssembly().flip(0.7);
-                flipState = true;
-            } else if (flip && flipState == true) {
-                while (roverRuckusBot.getArmAssembly().robotHardware.deliveryTouch.getState() == true) {
-                    roverRuckusBot.getArmAssembly().retractDeposit(0.2);
-                }
-                roverRuckusBot.getArmAssembly().flip(0.09);
-                flipState = false;
-            }
-            else
-            {
-                roverRuckusBot.getArmAssembly().flip(0.09);
-            }
-            //Deliv Servo
-            if (delivServoUp)
-            {
-                roverRuckusBot.getArmAssembly().deliveryUp();
-                isDelivServoUpPressed = true;
-            }
-            else if (delivServoDown) {
-                roverRuckusBot.getArmAssembly().deliverDown();
-                isDelivServoUpPressed = false;
-            }
-            else
-            {
-                roverRuckusBot.getArmAssembly().deliveryStop();
+                flipPos = 0.7;
             }
 
-        /*
-            //Intake wrist automation
-            if (wristAutomate)
+            if(manualFlip > 0)
             {
-                runtime.reset();
-                while (runtime.seconds() < 0.4) {
-                    roverRuckusBot.getArmAssembly().moveWrist(-0.8);
-                }
-                roverRuckusBot.getArmAssembly().moveWrist(0);
-                //while (roverRuckusBot.getArmAssembly().robotHardware.backTouch.getState() == false) {
-                //    roverRuckusBot.getArmAssembly().retractGrabber(0.8);
-                //}
-                //roverRuckusBot.getArmAssembly().stopGrabberExtension();
-                while (roverRuckusBot.getArmAssembly().robotHardware.wristTouch.getState() == false) {
-                    roverRuckusBot.getArmAssembly().moveWrist(-0.8);
-                }
-                roverRuckusBot.getArmAssembly().moveWrist(0);
-                runtime.reset();
-                while (runtime.seconds() < 1.5) {
-                    roverRuckusBot.getArmAssembly().intakeMineral(1.0);
-                }
+                flipPos = flipPos + 0.01;
+                roverRuckusBot.getArmAssembly().flip(flipPos);
             }
-*/
 
-            if(wristUp)
+
+            //Wrist Controls
+            if(wristDown)
             {
-                roverRuckusBot.getArmAssembly().moveWrist(0.8);
+                while(opModeIsActive() && roverRuckusBot.getArmAssembly().robotHardware.wristTouchDown.getState() && !terminate)
+                {
+                    terminate = gamepad1.y;
+
+                    roverRuckusBot.getArmAssembly().moveWrist(-0.8);
+
+                    //Movement
+                    drive = gamepad1.left_stick_y;
+                    turn = gamepad1.left_stick_x;
+                    sideRight = gamepad1.right_trigger;
+                    sideLeft = gamepad1.left_trigger;
+                    extendGrabber  = gamepad2.dpad_up;
+                    retractGrabber = gamepad2.dpad_down;
+
+
+                    if (drive > 0) {
+                        roverRuckusBot.getChassisAssembly().moveForward(-WHEEL_SPEED * drive);
+                    }
+                    //backwards
+                    else if (drive < 0) {
+                        roverRuckusBot.getChassisAssembly().moveBackwards(WHEEL_SPEED * drive);
+                    }
+                    //turn right
+                    else if (turn > 0) {
+                        roverRuckusBot.getChassisAssembly().turnRight(WHEEL_SPEED * turn);
+                    }
+                    //turn left
+                    else if (turn < 0) {
+                        roverRuckusBot.getChassisAssembly().turnLeft(WHEEL_SPEED * -turn);
+                    }
+                    //side right
+                    else if (sideRight > 0) {
+                        roverRuckusBot.getChassisAssembly().moveRight(-WHEEL_SPEED * sideRight);
+                    }
+                    //side left
+                    else if (sideLeft > 0) {
+                        roverRuckusBot.getChassisAssembly().moveLeft(-WHEEL_SPEED * sideLeft);
+                    }
+                    //stop moving
+                    else {
+                        roverRuckusBot.getChassisAssembly().stopMoving();
+                    }
+
+                    //Sliding Out the Grabber
+                    if (extendGrabber) {
+                        roverRuckusBot.getArmAssembly().extendGrabber(0.8);
+                    } else if (retractGrabber) {
+                        roverRuckusBot.getArmAssembly().retractGrabber(0.8);
+                    } else {
+                        roverRuckusBot.getArmAssembly().stopGrabberExtension();
+                    }
+                }
+                roverRuckusBot.getArmAssembly().moveWrist(0);
+
+                intakeOn = true;
             }
-            else if (wristDown)
+
+
+
+
+            if(wristReturn)
+            {
+
+                roverRuckusBot.getChassisAssembly().stopMoving();
+
+                runtime.reset();
+
+                //Move the Wrist Up
+                while(opModeIsActive() && runtime.seconds() < 1.2 && !terminate)
+                {
+                    terminate = gamepad1.y;
+
+                    roverRuckusBot.getArmAssembly().moveWrist(0.8);
+
+
+                    //MOVEMENT
+                     drive = gamepad1.left_stick_y;
+                     turn = gamepad1.left_stick_x;
+                     sideRight = gamepad1.right_trigger;
+                     sideLeft = gamepad1.left_trigger;
+                    if (drive > 0) {
+                        roverRuckusBot.getChassisAssembly().moveForward(-WHEEL_SPEED * drive);
+                    }
+                    //backwards
+                    else if (drive < 0) {
+                        roverRuckusBot.getChassisAssembly().moveBackwards(WHEEL_SPEED * drive);
+                    }
+                    //turn right
+                    else if (turn > 0) {
+                        roverRuckusBot.getChassisAssembly().turnRight(WHEEL_SPEED * turn);
+                    }
+                    //turn left
+                    else if (turn < 0) {
+                        roverRuckusBot.getChassisAssembly().turnLeft(WHEEL_SPEED * -turn);
+                    }
+                    //side right
+                    else if (sideRight > 0) {
+                        roverRuckusBot.getChassisAssembly().moveRight(-WHEEL_SPEED * sideRight);
+                    }
+                    //side left
+                    else if (sideLeft > 0) {
+                        roverRuckusBot.getChassisAssembly().moveLeft(-WHEEL_SPEED * sideLeft);
+                    }
+                    //stop moving
+                    else {
+                        roverRuckusBot.getChassisAssembly().stopMoving();
+                    }
+                }
+                intakeOn = false;
+                roverRuckusBot.getArmAssembly().stopIntake();
+                roverRuckusBot.getArmAssembly().moveWrist(0);
+
+                //Retract the Extension
+                while(opModeIsActive() && roverRuckusBot.getArmAssembly().robotHardware.backTouch.getState() && !terminate)
+                {
+                    terminate = gamepad1.y;
+
+                    roverRuckusBot.getArmAssembly().retractGrabber(0.8);
+
+
+                    //Movement
+                    drive = gamepad1.left_stick_y;
+                    turn = gamepad1.left_stick_x;
+                    sideRight = gamepad1.right_trigger;
+                    sideLeft = gamepad1.left_trigger;
+                    if (drive > 0) {
+                        roverRuckusBot.getChassisAssembly().moveForward(-WHEEL_SPEED * drive);
+                    }
+                    //backwards
+                    else if (drive < 0) {
+                        roverRuckusBot.getChassisAssembly().moveBackwards(WHEEL_SPEED * drive);
+                    }
+                    //turn right
+                    else if (turn > 0) {
+                        roverRuckusBot.getChassisAssembly().turnRight(WHEEL_SPEED * turn);
+                    }
+                    //turn left
+                    else if (turn < 0) {
+                        roverRuckusBot.getChassisAssembly().turnLeft(WHEEL_SPEED * -turn);
+                    }
+                    //side right
+                    else if (sideRight > 0) {
+                        roverRuckusBot.getChassisAssembly().moveRight(-WHEEL_SPEED * sideRight);
+                    }
+                    //side left
+                    else if (sideLeft > 0) {
+                        roverRuckusBot.getChassisAssembly().moveLeft(-WHEEL_SPEED * sideLeft);
+                    }
+                    //stop moving
+                    else {
+                        roverRuckusBot.getChassisAssembly().stopMoving();
+                    }
+                }
+                roverRuckusBot.getArmAssembly().stopGrabberExtension();
+
+                //Move the Wrist All the Way UP
+                while (opModeIsActive() && roverRuckusBot.getArmAssembly().robotHardware.wristTouch.getState() && !terminate)
+                {
+                    terminate = gamepad1.y;
+
+                    roverRuckusBot.getArmAssembly().moveWrist(0.8);
+
+
+                    //Movement
+                    drive = gamepad1.left_stick_y;
+                    turn = gamepad1.left_stick_x;
+                    sideRight = gamepad1.right_trigger;
+                    sideLeft = gamepad1.left_trigger;
+                    if (drive > 0) {
+                        roverRuckusBot.getChassisAssembly().moveForward(-WHEEL_SPEED * drive);
+                    }
+                    //backwards
+                    else if (drive < 0) {
+                        roverRuckusBot.getChassisAssembly().moveBackwards(WHEEL_SPEED * drive);
+                    }
+                    //turn right
+                    else if (turn > 0) {
+                        roverRuckusBot.getChassisAssembly().turnRight(WHEEL_SPEED * turn);
+                    }
+                    //turn left
+                    else if (turn < 0) {
+                        roverRuckusBot.getChassisAssembly().turnLeft(WHEEL_SPEED * -turn);
+                    }
+                    //side right
+                    else if (sideRight > 0) {
+                        roverRuckusBot.getChassisAssembly().moveRight(-WHEEL_SPEED * sideRight);
+                    }
+                    //side left
+                    else if (sideLeft > 0) {
+                        roverRuckusBot.getChassisAssembly().moveLeft(-WHEEL_SPEED * sideLeft);
+                    }
+                    //stop moving
+                    else {
+                        roverRuckusBot.getChassisAssembly().stopMoving();
+                    }
+                }
+                roverRuckusBot.getArmAssembly().moveWrist(0);
+
+
+                runtime.reset();
+                while(opModeIsActive() && runtime.seconds() < 1.5 && !terminate)
+                {
+                    terminate = gamepad1.y;
+
+                    roverRuckusBot.getArmAssembly().intakeMineral(1);
+
+                    //Movement
+                    drive = gamepad1.left_stick_y;
+                    turn = gamepad1.left_stick_x;
+                    sideRight = gamepad1.right_trigger;
+                    sideLeft = gamepad1.left_trigger;
+                    if (drive > 0) {
+                        roverRuckusBot.getChassisAssembly().moveForward(-WHEEL_SPEED * drive);
+                    }
+                    //backwards
+                    else if (drive < 0) {
+                        roverRuckusBot.getChassisAssembly().moveBackwards(WHEEL_SPEED * drive);
+                    }
+                    //turn right
+                    else if (turn > 0) {
+                        roverRuckusBot.getChassisAssembly().turnRight(WHEEL_SPEED * turn);
+                    }
+                    //turn left
+                    else if (turn < 0) {
+                        roverRuckusBot.getChassisAssembly().turnLeft(WHEEL_SPEED * -turn);
+                    }
+                    //side right
+                    else if (sideRight > 0) {
+                        roverRuckusBot.getChassisAssembly().moveRight(-WHEEL_SPEED * sideRight);
+                    }
+                    //side left
+                    else if (sideLeft > 0) {
+                        roverRuckusBot.getChassisAssembly().moveLeft(-WHEEL_SPEED * sideLeft);
+                    }
+                    //stop moving
+                    else {
+                        roverRuckusBot.getChassisAssembly().stopMoving();
+                    }
+                }
+                roverRuckusBot.getArmAssembly().stopIntake();
+            }
+
+
+            //Controlling the Wrist Manually
+            if(manualWristDown > 0 && roverRuckusBot.getArmAssembly().robotHardware.wristTouchDown.getState())
             {
                 roverRuckusBot.getArmAssembly().moveWrist(-0.8);
             }
+            else if(manualWristUp > 0 && roverRuckusBot.getArmAssembly().robotHardware.wristTouch.getState())
+            {
+                roverRuckusBot.getArmAssembly().moveWrist(0.8);
+            }
             else
             {
                 roverRuckusBot.getArmAssembly().moveWrist(0);
             }
-
-
         }
     }
 }

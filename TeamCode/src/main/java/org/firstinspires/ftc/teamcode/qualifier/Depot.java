@@ -522,10 +522,10 @@ public class Depot extends LinearOpMode
         robot.getArmAssembly().stopDepositExtension();
         sleep(250);
 
-        robot.getArmAssembly().flip(0.9);
+        robot.getArmAssembly().flip(0.7);
         sleep(2000);
 
-        robot.getArmAssembly().flip(0.2);
+        robot.getArmAssembly().flip(0.009);
     }//end of release marker
 
 

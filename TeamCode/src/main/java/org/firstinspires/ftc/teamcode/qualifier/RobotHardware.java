@@ -33,9 +33,8 @@ public class RobotHardware
     public DigitalChannel wristTouch = null;
     public DigitalChannel backTouch = null;
     public DigitalChannel deliveryTouch = null;
+    public DigitalChannel wristTouchDown = null;
 
-
-    public CRServo deliveryLiftServo = null;
     //Adding the Hardware Map
     private HardwareMap hwMap  = null;
 
@@ -65,7 +64,6 @@ public class RobotHardware
         robotLift.setDirection(DcMotor.Direction.FORWARD);
         topTouch = hwMap.get(DigitalChannel.class, "topTouch");
 
-
         //Arm
         intakeSlides = hwMap.get(DcMotor.class , "intakeSlides");
         deliveryLift = hwMap.get(DcMotor.class , "deliveryLift");
@@ -78,8 +76,8 @@ public class RobotHardware
         wristTouch = hwMap.get(DigitalChannel.class, "wristTouch");
         backTouch = hwMap.get(DigitalChannel.class, "backTouch");
         deliveryTouch = hwMap.get(DigitalChannel.class, "deliveryTouch");
+        wristTouchDown = hwMap.get(DigitalChannel.class , "touchDown");
 
-        deliveryLiftServo = hwMap.get(CRServo.class , "deliveryServo");
 
 
     }

@@ -27,13 +27,13 @@ public class ArmAssembly
 
     protected void extendGrabber(double speed)
     {
-        robotHardware.intakeSlides.setPower(speed);
+        robotHardware.intakeSlides.setPower(-speed);
     }
 
     protected void retractGrabber(double speed)
     {
 
-        robotHardware.intakeSlides.setPower(-speed);
+        robotHardware.intakeSlides.setPower(speed);
     }
 
     protected void stopGrabberExtension()
@@ -79,24 +79,9 @@ public class ArmAssembly
 
     protected void moveWrist (double power)
     {
-        robotHardware.mineralWrist.setPower(power);
+        robotHardware.mineralWrist.setPower(-power);
     }
 
-    /**
-     * CR SERVO LIFT CONTROL
-     */
-    protected void deliveryUp()
-    {
-        robotHardware.deliveryLiftServo.setPower(0.8);
-    }
-    protected void deliverDown()
-    {
-        robotHardware.deliveryLiftServo.setPower(-0.8);
-    }
-    protected void deliveryStop()
-    {
-        robotHardware.deliveryLiftServo.setPower(0.004);
-    }
 
 
 }
