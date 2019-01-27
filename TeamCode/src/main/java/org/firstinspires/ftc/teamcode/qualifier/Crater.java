@@ -31,7 +31,8 @@ public class Crater extends LinearOpMode
     //Motion Variables
     double distanceToDepot = 48;
     double distanceToWall;
-    double forwardDistance = 15;
+    double forwardDistance = 18;
+    double backwardsDistance = -14;
     double distanceToCrater = -72;
     double robotAngle = 0;
     int goldLoc = 0;
@@ -52,7 +53,7 @@ public class Crater extends LinearOpMode
     //Creating a Rover robot object
     RoverRobot robot = new RoverRobot();
 
-    private static final double WHEEL_SPEED = 0.5;
+    private static final double WHEEL_SPEED = 1;
     private ElapsedTime runtime = new ElapsedTime();
 
 
@@ -82,7 +83,11 @@ public class Crater extends LinearOpMode
         runtime.reset();
         robot.getChassisAssembly().changeToEncoderMode();
 
-       // releaseRobot();
+
+        //releaseRobot();
+
+
+
 
         moveFromLander();
 
@@ -91,6 +96,7 @@ public class Crater extends LinearOpMode
         placeMarker();
 
         parkInCrater();
+
 
 
     }
@@ -121,6 +127,29 @@ public class Crater extends LinearOpMode
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }//End of initTFod
 
+
+    /**
+     * RELEASE ROBOT METHOD
+     */
+    public void releaseRobot() {
+
+
+        while (robot.getLiftAssembly().robotHardware.topTouch.getState() == true)
+        {
+            robot.getLiftAssembly().liftUpRobot(0.5);
+            telemetry.addData("in  while loop", "still going on");
+            telemetry.update();
+        }
+        robot.getLiftAssembly().resetLift();
+        telemetry.addData("outside while loop: ", "reached the top");
+        telemetry.update();
+
+        runtime.reset();
+        encoderDrive(1 , -5, 4);
+        telemetry.addData("in stop moving","stopped");
+        telemetry.update();
+
+    }
 
     /**
      *ENCODER DRIVE METHOD
@@ -349,29 +378,6 @@ public class Crater extends LinearOpMode
     }//end of encoderSide
 
 
-    public void releaseRobot() {
-
-
-        while (robot.getLiftAssembly().robotHardware.topTouch.getState() == true)
-        {
-            robot.getLiftAssembly().liftUpRobot(0.5);
-            telemetry.addData("in  while loop", "still going on");
-            telemetry.update();
-        }
-        robot.getLiftAssembly().resetLift();
-        telemetry.addData("outside while loop: ", "reached the top");
-        telemetry.update();
-
-        runtime.reset();
-        while (runtime.seconds() < 0.4)
-        {
-            robot.getChassisAssembly().moveForward(0.4);
-        }
-        robot.getChassisAssembly().stopMoving();
-        telemetry.addData("in stop moving","stopped");
-        telemetry.update();
-
-    }
     /**
      * MOVE FROM LANDER METHOD
      */
@@ -379,12 +385,9 @@ public class Crater extends LinearOpMode
     {
         double angle = 100;
 
-        encoderSide(WHEEL_SPEED , 15 , "LEFT" , 6);
+        encoderSide(WHEEL_SPEED , 17 , "LEFT" , 6);
         runtime.reset();
-        while (runtime.seconds() < 0.5)
-        {
-            robot.getChassisAssembly().moveBackwards(0.4);
-        }
+        encoderDrive(WHEEL_SPEED , 6 , 5);
         robot.getChassisAssembly().stopMoving();
 
         encoderTurn(WHEEL_SPEED , angle , "LEFT" , 5);
@@ -432,7 +435,7 @@ public class Crater extends LinearOpMode
                     telemetry.addData("Moving Right" , "");
                     telemetry.update();
                     //Move to Position -1
-                    encoderSide(WHEEL_SPEED , 17 , "RIGHT" , 5);
+                    encoderSide(WHEEL_SPEED , 16 , "RIGHT" , 5);
                     goldLoc = -1;
                 }
                 else if(goldLoc == -1)
@@ -482,13 +485,13 @@ public class Crater extends LinearOpMode
      */
     private void placeMarker()
     {
-        encoderDrive(WHEEL_SPEED , -forwardDistance , 5);
+        encoderDrive(WHEEL_SPEED , backwardsDistance , 5);
 
         encoderTurn(WHEEL_SPEED , 105 , "LEFT" , 5);
 
         if(goldLoc == -1)
         {
-            distanceToWall = 60;
+            distanceToWall = 48;
         }
         else if(goldLoc == 0)
         {
@@ -520,9 +523,9 @@ public class Crater extends LinearOpMode
      */
     private void wallAlign()
     {
-        encoderSide(0.1 , 7, "RIGHT" , 5);
+        encoderSide(0.1 , 5, "RIGHT" , 5);
 
-        encoderSide(WHEEL_SPEED , 5 , "LEFT" , 5);
+        encoderSide(WHEEL_SPEED , 2 , "LEFT" , 5);
     }//end of wall Align
 
 
@@ -541,18 +544,20 @@ public class Crater extends LinearOpMode
     {
         runtime.reset();
 
-        while(opModeIsActive() && runtime.seconds() < 1)
+        while(opModeIsActive() && runtime.seconds() < 0.5)
         {
-            robot.getArmAssembly().extendDeposit(0.4);
+            robot.getArmAssembly().extendGrabber(0.8);
         }
-        robot.getArmAssembly().stopDepositExtension();
+        robot.getArmAssembly().stopGrabberExtension();
         sleep(250);
 
         robot.getArmAssembly().flip(0.7);
         sleep(2000);
 
-        robot.getArmAssembly().flip(0.009);
     }//end of release marker
+
+
+
 
 
 }

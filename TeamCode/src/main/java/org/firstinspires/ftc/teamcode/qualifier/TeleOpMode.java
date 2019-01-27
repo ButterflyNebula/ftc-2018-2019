@@ -157,59 +157,18 @@ public class TeleOpMode extends LinearOpMode {
                 roverRuckusBot.getArmAssembly().flip(0.09);
                 flipPos = 0.09;
 
+                runtime.reset();
+                while(opModeIsActive() && runtime.seconds() < 0.5)
+                {
+                    roverRuckusBot.getArmAssembly().extendGrabber(0.8);
+                }
+                roverRuckusBot.getArmAssembly().stopGrabberExtension();
+
                 while(opModeIsActive() && roverRuckusBot.getArmAssembly().robotHardware.deliveryTouch.getState() && !terminate)
                 {
                     terminate = gamepad1.y;
 
                     roverRuckusBot.getArmAssembly().retractDeposit(1);
-
-
-                    //Movement
-                    drive = gamepad1.left_stick_y;
-                    turn = gamepad1.left_stick_x;
-                    sideRight = gamepad1.right_trigger;
-                    sideLeft = gamepad1.left_trigger;
-                    extendGrabber  = gamepad2.dpad_up;
-                    retractGrabber = gamepad2.dpad_down;
-
-
-                    if (drive > 0) {
-                        roverRuckusBot.getChassisAssembly().moveForward(-WHEEL_SPEED * drive);
-                    }
-                    //backwards
-                    else if (drive < 0) {
-                        roverRuckusBot.getChassisAssembly().moveBackwards(WHEEL_SPEED * drive);
-                    }
-                    //turn right
-                    else if (turn > 0) {
-                        roverRuckusBot.getChassisAssembly().turnRight(WHEEL_SPEED * turn);
-                    }
-                    //turn left
-                    else if (turn < 0) {
-                        roverRuckusBot.getChassisAssembly().turnLeft(WHEEL_SPEED * -turn);
-                    }
-                    //side right
-                    else if (sideRight > 0) {
-                        roverRuckusBot.getChassisAssembly().moveRight(-WHEEL_SPEED * sideRight);
-                    }
-                    //side left
-                    else if (sideLeft > 0) {
-                        roverRuckusBot.getChassisAssembly().moveLeft(-WHEEL_SPEED * sideLeft);
-                    }
-                    //stop moving
-                    else {
-                        roverRuckusBot.getChassisAssembly().stopMoving();
-                    }
-
-                    //Sliding Out the Grabber
-                    if (extendGrabber) {
-                        roverRuckusBot.getArmAssembly().extendGrabber(0.8);
-                    } else if (retractGrabber) {
-                        roverRuckusBot.getArmAssembly().retractGrabber(0.8);
-                    } else {
-                        roverRuckusBot.getArmAssembly().stopGrabberExtension();
-                    }
-
                 }
                 roverRuckusBot.getArmAssembly().stopDepositExtension();
             }

@@ -42,7 +42,7 @@ public class Depot extends LinearOpMode
     //Motion Variables
     double distanceToDepot;
     double distanceToWall;
-    double forwardDistance = 25;
+    double forwardDistance = 30;
     double distanceToCrater = -72;
 
     double robotAngle = 0;
@@ -89,7 +89,10 @@ public class Depot extends LinearOpMode
         //Wait for Start
         telemetry.addData(">", "Press Play to begin");
         telemetry.update();
+
         waitForStart();
+
+       // releaseRobot();
 
         moveFromLander();
 
@@ -197,7 +200,6 @@ public class Depot extends LinearOpMode
 
         }
 
-        sleep(250);
     }//end of encoderDrive
 
 
@@ -280,6 +282,30 @@ public class Depot extends LinearOpMode
 
         sleep(250);
     }//end of encoderTurn
+
+
+    /**
+     * RELEASE ROBOT METHOD
+     */
+    public void releaseRobot() {
+
+
+        while (robot.getLiftAssembly().robotHardware.topTouch.getState() == true)
+        {
+            robot.getLiftAssembly().liftUpRobot(0.5);
+            telemetry.addData("in  while loop", "still going on");
+            telemetry.update();
+        }
+        robot.getLiftAssembly().resetLift();
+        telemetry.addData("outside while loop: ", "reached the top");
+        telemetry.update();
+
+        runtime.reset();
+        encoderDrive(1 , -5, 4);
+        telemetry.addData("in stop moving","stopped");
+        telemetry.update();
+
+    }
 
     /**
      * ENCODER SIDE METHOD
@@ -367,7 +393,10 @@ public class Depot extends LinearOpMode
     {
         double angle = 100;
 
-        encoderSide(WHEEL_SPEED , 12 , "LEFT" , 5);
+        encoderSide(WHEEL_SPEED , 17 , "LEFT" , 6);
+        runtime.reset();
+        encoderDrive(WHEEL_SPEED , 6 , 5);
+        robot.getChassisAssembly().stopMoving();
 
         encoderTurn(WHEEL_SPEED , angle , "LEFT" , 5);
 
@@ -414,7 +443,7 @@ public class Depot extends LinearOpMode
                     telemetry.addData("Moving Right" , "");
                     telemetry.update();
                     //Move to Position -1
-                    encoderSide(WHEEL_SPEED , 12 , "RIGHT" , 5);
+                    encoderSide(WHEEL_SPEED , 16 , "RIGHT" , 5);
                     goldLoc = -1;
                 }
                 else if(goldLoc == -1)
@@ -423,7 +452,7 @@ public class Depot extends LinearOpMode
                     telemetry.addData("Gold Loc: " , goldLoc);
                     telemetry.addData("Moving Left" , "");
                     telemetry.update();
-                    encoderSide(WHEEL_SPEED , 24 , "LEFT" , 8);
+                    encoderSide(WHEEL_SPEED , 30  , "LEFT" , 8);
                     goldLoc = 1;
                 }
                 else
@@ -471,17 +500,17 @@ public class Depot extends LinearOpMode
         //Move Sideways
         if(goldLoc == -1)
         {
-            distanceToWall = 36;
-            distanceToDepot = 0;
+            distanceToWall = 30;
+            distanceToDepot = -12;
         }
         else if(goldLoc == 0)
         {
-            distanceToWall = 24;
-            distanceToDepot = 12;
+            distanceToWall = 18;
+            distanceToDepot = -6;
         }
         else
         {
-            distanceToWall = 12;
+            distanceToWall = 0;
             distanceToDepot = 36;
 
         }
@@ -515,17 +544,15 @@ public class Depot extends LinearOpMode
     {
         runtime.reset();
 
-        while(opModeIsActive() && runtime.seconds() < 1)
+        while(opModeIsActive() && runtime.seconds() < 0.5)
         {
-            robot.getArmAssembly().extendDeposit(0.4);
+            robot.getArmAssembly().extendGrabber(0.8);
         }
-        robot.getArmAssembly().stopDepositExtension();
+        robot.getArmAssembly().stopGrabberExtension();
         sleep(250);
 
         robot.getArmAssembly().flip(0.7);
         sleep(2000);
-
-        robot.getArmAssembly().flip(0.009);
     }//end of release marker
 
 
