@@ -5,11 +5,14 @@ package org.firstinspires.ftc.teamcode.qualifier;
  */
 
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 
 
 public class RobotHardware
@@ -30,10 +33,18 @@ public class RobotHardware
     public CRServo mineralWrist = null;
     public DcMotor intakeMineral = null;
     public Servo flipper = null;
+
+    //Touch Sensors
     public DigitalChannel wristTouch = null;
     public DigitalChannel backTouch = null;
     public DigitalChannel deliveryTouch = null;
     public DigitalChannel wristTouchDown = null;
+
+    //Distance Sensors
+    public ModernRoboticsI2cRangeSensor frontDistanceSensor = null;
+    public ModernRoboticsI2cRangeSensor backDistanceSensor = null;
+
+
 
     //Adding the Hardware Map
     private HardwareMap hwMap  = null;
@@ -41,7 +52,9 @@ public class RobotHardware
     public  RobotHardware(HardwareMap ahwMap)
     {
         hwMap = ahwMap;
-        //Initialize the wheel motors
+
+
+        //Wheel motors
         frontLeftWheel = hwMap.get(DcMotor.class, "frontLeft");
         frontRightWheel = hwMap.get(DcMotor.class, "frontRight");
         backLeftWheel = hwMap.get(DcMotor.class, "backLeft");
@@ -57,8 +70,7 @@ public class RobotHardware
         frontRightWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
         backRightWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
 
-
-        //Initialize the lift motor and sensors
+        //Lift
         robotLift = hwMap.get(DcMotor.class, "robotLift");
         robotLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robotLift.setDirection(DcMotor.Direction.FORWARD);
@@ -73,10 +85,17 @@ public class RobotHardware
         intakeMineral.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMineral.setDirection(DcMotor.Direction.FORWARD);
         flipper = hwMap.get(Servo.class, "flipper");
+
+        //Touch Sensors
         wristTouch = hwMap.get(DigitalChannel.class, "wristTouch");
         backTouch = hwMap.get(DigitalChannel.class, "backTouch");
         deliveryTouch = hwMap.get(DigitalChannel.class, "deliveryTouch");
         wristTouchDown = hwMap.get(DigitalChannel.class , "touchDown");
+
+
+        //Distance Sensors
+        frontDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class , "frontDistanceSensor");
+        backDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "backDistanceSensor");
 
 
 

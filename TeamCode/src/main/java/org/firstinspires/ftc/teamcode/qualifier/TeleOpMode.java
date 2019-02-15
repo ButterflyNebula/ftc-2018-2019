@@ -23,7 +23,12 @@ public class TeleOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
         roverRuckusBot.initRobot(hardwareMap);
-        waitForStart();
+
+        while (!opModeIsActive() && !isStopRequested())
+        {
+            telemetry.addData("status" , "waiting for start command...");
+            telemetry.update();
+        }
 
         while (opModeIsActive()) {
 

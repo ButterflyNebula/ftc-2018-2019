@@ -87,12 +87,17 @@ public class Depot extends LinearOpMode
         }
 
         //Wait for Start
-        telemetry.addData(">", "Press Play to begin");
-        telemetry.update();
+       // telemetry.addData(">", "Press Play to begin");
+        //telemetry.update();
 
-        waitForStart();
+       // waitForStart();
+        while (!opModeIsActive() && !isStopRequested())
+        {
+            telemetry.addData("status" , "waiting for start command...");
+            telemetry.update();
+        }
 
-       // releaseRobot();
+        releaseRobot();
 
         moveFromLander();
 
@@ -100,7 +105,7 @@ public class Depot extends LinearOpMode
 
         placeMarker();
 
-        parkInCrater();
+        //parkInCrater();
 
     }
 
@@ -280,7 +285,6 @@ public class Depot extends LinearOpMode
             robot.getChassisAssembly().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
-        sleep(250);
     }//end of encoderTurn
 
 
@@ -301,7 +305,7 @@ public class Depot extends LinearOpMode
         telemetry.update();
 
         runtime.reset();
-        encoderDrive(1 , -5, 4);
+        encoderDrive(1 , -5, 10);
         telemetry.addData("in stop moving","stopped");
         telemetry.update();
 
@@ -382,7 +386,6 @@ public class Depot extends LinearOpMode
             robot.getChassisAssembly().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
-        sleep(250);
     }//end of encoderSide
 
 
@@ -391,7 +394,7 @@ public class Depot extends LinearOpMode
      */
     private void moveFromLander()
     {
-        double angle = 100;
+        double angle = 110;
 
         encoderSide(WHEEL_SPEED , 17 , "LEFT" , 6);
         runtime.reset();
@@ -423,7 +426,7 @@ public class Depot extends LinearOpMode
             goldFound = isGold(updatedRecognitions);
             telemetry.addData("Is Gold Found: ", goldFound);
 
-            if(goldLoc == 1)
+            if(goldLoc == -1)
             {
                 goldFound = true;
             }
@@ -442,22 +445,22 @@ public class Depot extends LinearOpMode
                     telemetry.addData("Gold Loc: " , goldLoc);
                     telemetry.addData("Moving Right" , "");
                     telemetry.update();
-                    //Move to Position -1
-                    encoderSide(WHEEL_SPEED , 16 , "RIGHT" , 5);
-                    goldLoc = -1;
+                    //Move to Position 1
+                    encoderSide(WHEEL_SPEED , 17 , "LEFT" , 5);
+                    goldLoc = 1;
                 }
-                else if(goldLoc == -1)
+                else if(goldLoc == 1)
                 {
                     //Move to Position 1
                     telemetry.addData("Gold Loc: " , goldLoc);
                     telemetry.addData("Moving Left" , "");
                     telemetry.update();
-                    encoderSide(WHEEL_SPEED , 30  , "LEFT" , 8);
-                    goldLoc = 1;
+                    encoderSide(WHEEL_SPEED , 30  , "RIGHT" , 8);
+                    goldLoc = -1;
                 }
                 else
                 {
-                    goldLoc = 1;
+                    goldLoc = -1;
                     telemetry.addData("Gold Loc: " , goldLoc);
                     telemetry.addData("Couldn't find Gold - Defaulting Value to True " , goldLoc);
                     telemetry.update();
@@ -494,7 +497,7 @@ public class Depot extends LinearOpMode
     private void placeMarker()
     {
         //Turn back to original angle
-        encoderTurn(WHEEL_SPEED , robotAngle , "RIGHT" , 5);
+        encoderTurn(WHEEL_SPEED , robotAngle , "RIGHT" , 10);
 
 
         //Move Sideways
@@ -515,13 +518,15 @@ public class Depot extends LinearOpMode
 
         }
 
-        encoderSide(WHEEL_SPEED , distanceToWall , "LEFT" , 5);
+        encoderSide(WHEEL_SPEED , distanceToWall , "LEFT" , 10);
 
-        wallAlign();
-
-        encoderDrive(WHEEL_SPEED , distanceToDepot , 5);
+        encoderDrive(WHEEL_SPEED , distanceToDepot , 10);
 
         releaseMarker();
+
+        //wallAlign();
+
+
     }//end of Place Marker
 
     /**
@@ -529,15 +534,15 @@ public class Depot extends LinearOpMode
      */
     private void wallAlign()
     {
-        encoderSide(0.1 , 7, "LEFT" , 5);
+        encoderSide(0.1 , 7, "LEFT" , 10);
 
-        encoderSide(WHEEL_SPEED , 5 , "RIGHT" , 5);
+        encoderSide(WHEEL_SPEED , 5 , "RIGHT" , 10);
     }//end of wall Align
 
 
     private void parkInCrater()
     {
-        encoderDrive(WHEEL_SPEED , distanceToCrater , 5);
+        encoderDrive(WHEEL_SPEED , distanceToCrater , 10);
     }
 
     private void releaseMarker()

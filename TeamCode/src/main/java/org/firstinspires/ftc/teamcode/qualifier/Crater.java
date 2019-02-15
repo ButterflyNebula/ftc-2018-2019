@@ -75,19 +75,21 @@ public class Crater extends LinearOpMode
         }
 
         //Wait for Start
-        telemetry.addData(">", "Press Play to begin");
-        telemetry.update();
-        waitForStart();
+        //telemetry.addData(">", "Press Play to begin");
+        //telemetry.update();
 
+        //waitForStart();
+        while (!opModeIsActive() && !isStopRequested())
+        {
+            telemetry.addData("status" , "waiting for start command...");
+            telemetry.update();
+        }
 
         runtime.reset();
         robot.getChassisAssembly().changeToEncoderMode();
 
 
-        //releaseRobot();
-
-
-
+        releaseRobot();
 
         moveFromLander();
 
@@ -95,7 +97,7 @@ public class Crater extends LinearOpMode
 
         placeMarker();
 
-        parkInCrater();
+  //      parkInCrater();
 
 
 
@@ -383,11 +385,11 @@ public class Crater extends LinearOpMode
      */
     private void moveFromLander()
     {
-        double angle = 100;
+        double angle = 110;
 
         encoderSide(WHEEL_SPEED , 17 , "LEFT" , 6);
         runtime.reset();
-        encoderDrive(WHEEL_SPEED , 6 , 5);
+        encoderDrive(WHEEL_SPEED , 4 , 5);
         robot.getChassisAssembly().stopMoving();
 
         encoderTurn(WHEEL_SPEED , angle , "LEFT" , 5);
@@ -415,7 +417,7 @@ public class Crater extends LinearOpMode
             goldFound = isGold(updatedRecognitions);
             telemetry.addData("Is Gold Found: ", goldFound);
 
-            if(goldLoc == 1)
+            if(goldLoc == -1)
             {
                 goldFound = true;
             }
@@ -434,22 +436,22 @@ public class Crater extends LinearOpMode
                     telemetry.addData("Gold Loc: " , goldLoc);
                     telemetry.addData("Moving Right" , "");
                     telemetry.update();
-                    //Move to Position -1
-                    encoderSide(WHEEL_SPEED , 16 , "RIGHT" , 5);
-                    goldLoc = -1;
+                    //Move to Position 1
+                    encoderSide(WHEEL_SPEED , 16 , "LEFT" , 5);
+                    goldLoc = 1;
                 }
-                else if(goldLoc == -1)
+                else if(goldLoc == 1)
                 {
                     //Move to Position 1
                     telemetry.addData("Gold Loc: " , goldLoc);
                     telemetry.addData("Moving Left" , "");
                     telemetry.update();
-                    encoderSide(WHEEL_SPEED , 30  , "LEFT" , 8);
-                    goldLoc = 1;
+                    encoderSide(WHEEL_SPEED , 30  , "RIGHT" , 8);
+                    goldLoc = -1;
                 }
                 else
                 {
-                    goldLoc = 1;
+                    goldLoc = -1;
                     telemetry.addData("Gold Loc: " , goldLoc);
                     telemetry.addData("Couldn't find Gold - Defaulting Value to True " , goldLoc);
                     telemetry.update();
