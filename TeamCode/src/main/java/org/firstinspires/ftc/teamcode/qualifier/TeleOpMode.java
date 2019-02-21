@@ -11,6 +11,9 @@ public class TeleOpMode extends LinearOpMode {
     private static final double LIFT_UP_SPEED = 0.6;
     private static final double LIFT_DOWN_SPEED = 1.0;
 
+    private static final double COUNTS_PER_DELIV_INCH = 193.33;
+
+
     boolean intakeOn = false;
     //Creating a Rover robot object
     RoverRobot roverRuckusBot = new RoverRobot();
@@ -143,7 +146,7 @@ public class TeleOpMode extends LinearOpMode {
                 intakeOn = false;
                 roverRuckusBot.getArmAssembly().stopIntake();
 
-                roverRuckusBot.getArmAssembly().extendDeposit(1);
+                encoderDelivery(1, 16, "UP", 8);
             }
             //Retracting the Deposit (Manually)
             else if (retractDeposit && roverRuckusBot.getArmAssembly().robotHardware.deliveryTouch.getState()==true)
@@ -452,4 +455,68 @@ public class TeleOpMode extends LinearOpMode {
             }
         }
     }
+
+
+    /**
+     * ENCODER Delivery
+     * @param speed (at which to lift)
+     * @param inches (to turn a negative number will reverse direction)
+     * @param direction (UP or DOWN)
+     * @param timeoutS (robot will stop after this much time has passed)
+     */
+    public void encoderDelivery(double speed, double inches, String direction , double timeoutS)
+    {
+        int newTarget;
+
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            roverRuckusBot.getArmAssembly().changeToEncoderMode();
+
+
+            // Determine new target position, and pass to motor controller
+            if(direction == "UP")
+            {
+                newTarget = roverRuckusBot.getArmAssembly().getDeliveryLiftCurrentPosition() + (int) (inches * COUNTS_PER_DELIV_INCH);
+            }
+            else
+            {
+                newTarget = roverRuckusBot.getArmAssembly().getDeliveryLiftCurrentPosition() + (int) (-inches * COUNTS_PER_DELIV_INCH);
+
+            }
+
+            roverRuckusBot.getArmAssembly().setDeliveryLiftTargetPosition(newTarget);
+
+
+            // Turn On RUN_TO_POSITION
+            roverRuckusBot.getArmAssembly().setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            roverRuckusBot.getArmAssembly().extendDeposit(Math.abs(speed));
+
+
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (roverRuckusBot.getArmAssembly().isDeliveryLiftBusy() )) {
+
+                // Display it for the driver.
+                telemetry.addData("Path1",  "Running to %7d", newTarget);
+                telemetry.addData("Path2",  "Running at %7d", roverRuckusBot.getArmAssembly().getDeliveryLiftCurrentPosition());
+
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            roverRuckusBot.getArmAssembly().stopDepositExtension();
+
+            // Turn off RUN_TO_POSITION
+            roverRuckusBot.getArmAssembly().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
+    }//end of encoderDelivery
 }

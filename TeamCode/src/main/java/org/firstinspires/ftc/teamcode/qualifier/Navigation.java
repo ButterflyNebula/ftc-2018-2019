@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.qualifier;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 
-import org.firstinspires.ftc.teamcode.scrimmage.RobotHardware;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 
 public class Navigation
 {
@@ -14,6 +14,39 @@ public class Navigation
         robotHardware = hardware;
     }
 
-    protected BNO055IMU getImu(){return robotHardware.imu;}
+
+    protected double getCraterFrontDistance()
+    {
+        return robotHardware.frontDistanceSensor.getDistance(DistanceUnit.INCH);
+    }
+
+    protected double getCraterBackDistance()
+    {
+        return robotHardware.backDistanceSensor.getDistance(DistanceUnit.INCH);
+    }
+
+    protected double getCraterAngle()
+    {
+        final double distanceBetweenSensors = 9;
+
+        double frontDistance = getCraterFrontDistance();
+        double backDistance = getCraterBackDistance();
+
+
+        double differenceInDistance = frontDistance - backDistance;
+
+        double angle = Math.asin(differenceInDistance/distanceBetweenSensors);
+        angle = Math.toDegrees(angle);
+
+        return angle;
+    }
+
+    protected double getCraterDistance()
+    {
+        double frontDistance = getCraterFrontDistance();
+        double backDistance = getCraterBackDistance();
+
+        return 0.5 * (frontDistance + backDistance);
+    }
 
 }

@@ -15,6 +15,7 @@ public class RoverRobot
     private ChassisAssembly chassisAssembly= null;
     private ArmAssembly armAssembly= null;
     private LiftAssembly liftAssembly = null;
+    private Navigation navigation = null;
 
     public void initRobot (HardwareMap hwMap)
     {
@@ -22,6 +23,7 @@ public class RoverRobot
         buildChassisAssembly();
         buildLiftAssembly();
         buildArmAssembly();
+        buildNavigation();
 
     }
 
@@ -38,12 +40,15 @@ public class RoverRobot
         this.armAssembly = new ArmAssembly(robotHardware);
     }
 
+    public void buildNavigation() {this.navigation = new Navigation(robotHardware);}
+
     public LiftAssembly getLiftAssembly() { return liftAssembly;  }
     public ChassisAssembly getChassisAssembly()
     {
         return chassisAssembly;
     }
     public ArmAssembly  getArmAssembly()  {return armAssembly;}
+    public Navigation getNavigation() {return navigation;}
 
 
 }

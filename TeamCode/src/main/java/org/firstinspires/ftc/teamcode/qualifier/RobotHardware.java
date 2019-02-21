@@ -65,10 +65,12 @@ public class RobotHardware
         frontLeftWheel.setDirection(DcMotor.Direction.REVERSE);
         backLeftWheel.setDirection(DcMotor.Direction.REVERSE);
 
+        /*
         frontLeftWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
         backLeftWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
         frontRightWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
         backRightWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
+        */
 
         //Lift
         robotLift = hwMap.get(DcMotor.class, "robotLift");

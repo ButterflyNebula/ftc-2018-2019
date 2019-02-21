@@ -82,6 +82,25 @@ public class ArmAssembly
         robotHardware.mineralWrist.setPower(-power);
     }
 
+    public int getDeliveryLiftCurrentPosition() {return robotHardware.deliveryLift.getCurrentPosition();}
 
+    public void setDeliveryLiftTargetPosition(int position) {robotHardware.deliveryLift.setTargetPosition(position);}
+
+    public void changeToEncoderMode()
+    {
+        robotHardware.deliveryLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robotHardware.deliveryLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void setMode(DcMotor.RunMode mode)
+    {
+        robotHardware.deliveryLift.setMode(mode);
+    }
+
+    public boolean isDeliveryLiftBusy()
+    {
+        return robotHardware.deliveryLift.isBusy();
+    }
 
 }
+
