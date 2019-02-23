@@ -39,12 +39,15 @@ public class DistanceSensorTest extends LinearOpMode
 
             double differenceInDistance = frontDistance - backDistance;
 
-            double angle = Math.asin(differenceInDistance/distanceBetweenSensors);
+            double angle = Math.atan(differenceInDistance/distanceBetweenSensors);
             angle = Math.toDegrees(angle);
+            double angle2 = Math.asin(differenceInDistance/distanceBetweenSensors);
+            angle2 = Math.toDegrees(angle2);
 
             double distance = robot.getChassisAssembly().robotHardware.laserDistanceSensor.getDistance(DistanceUnit.INCH);
 
-            telemetry.addData("Angle " , angle);
+            telemetry.addData("Angle (tan) " , angle);
+            telemetry.addData("Angle (sin)" , angle2);
             telemetry.addData("Distance", distance);
 
             telemetry.update();

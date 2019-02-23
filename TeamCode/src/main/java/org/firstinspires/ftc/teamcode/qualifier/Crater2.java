@@ -229,11 +229,29 @@ public class Crater2 extends LinearOpMode
 
         laserDistance();
 
+        releaseMarker();
+
         encoderDrive(WHEEL_SPEED, distanceToCrater, 10);
 
 
 
     }//end of Place Marker
+
+    /**
+     * RELEASE MARKER METHOD
+     */
+    private void releaseMarker()
+    {
+        runtime.reset();
+        while (opModeIsActive() && runtime.seconds() < 0.5)
+        {
+            robot.getArmAssembly().extendGrabber(0.8);
+        }
+        robot.getArmAssembly().stopGrabberExtension();
+
+        robot.getArmAssembly().flipUp();
+        sleep(500);
+    }
 
     private void wallAlign()
     {

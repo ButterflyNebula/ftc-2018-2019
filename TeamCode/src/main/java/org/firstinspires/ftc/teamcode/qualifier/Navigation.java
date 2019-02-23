@@ -35,7 +35,7 @@ public class Navigation
 
         double differenceInDistance = frontDistance - backDistance;
 
-        double angle = Math.asin(differenceInDistance/distanceBetweenSensors);
+        double angle = Math.atan(differenceInDistance/distanceBetweenSensors);
         angle = Math.toDegrees(angle);
 
         return angle;
@@ -69,7 +69,7 @@ public class Navigation
 
         double differenceInDistance = frontDistance - backDistance;
 
-        double angle = Math.asin(differenceInDistance/distanceBetweenSensors);
+        double angle = Math.atan(differenceInDistance/distanceBetweenSensors);
         angle = Math.toDegrees(angle);
 
         return angle;

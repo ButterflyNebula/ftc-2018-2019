@@ -15,12 +15,12 @@ public class TeleOpMode extends LinearOpMode {
 
 
     boolean intakeOn = false;
+
     //Creating a Rover robot object
     RoverRobot roverRuckusBot = new RoverRobot();
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    boolean isDelivServoUpPressed  = false;
     double flipPos = 0.09;
 
     @Override
@@ -70,7 +70,6 @@ public class TeleOpMode extends LinearOpMode {
 
 
             //Movement
-            //forwards
             if (drive > 0) {
                 roverRuckusBot.getChassisAssembly().moveForward(-WHEEL_SPEED * drive);
             }
@@ -118,6 +117,7 @@ public class TeleOpMode extends LinearOpMode {
             }
 
 
+            //Intake
             if (outtake) {
                 roverRuckusBot.getArmAssembly().outTakeMineral(1.0);
             }
@@ -152,7 +152,7 @@ public class TeleOpMode extends LinearOpMode {
             else if (retractDeposit && roverRuckusBot.getArmAssembly().robotHardware.deliveryTouch.getState()==true)
             //not touching the sensor at the bottom of the lift
             {
-                roverRuckusBot.getArmAssembly().flip(0.09);
+                roverRuckusBot.getArmAssembly().flipDown();
                 roverRuckusBot.getArmAssembly().retractDeposit(1);
             } else {
                 roverRuckusBot.getArmAssembly().stopDepositExtension();
@@ -162,7 +162,7 @@ public class TeleOpMode extends LinearOpMode {
             //Retracting the Deposit (Automatically)
             if(depositReturn)
             {
-                roverRuckusBot.getArmAssembly().flip(0.09);
+                roverRuckusBot.getArmAssembly().flipDown();
                 flipPos = 0.09;
 
                 runtime.reset();
@@ -183,14 +183,14 @@ public class TeleOpMode extends LinearOpMode {
 
             //Flipping to Deposit the Minerals
             if (flip) {
-                roverRuckusBot.getArmAssembly().flip(0.7);
+                roverRuckusBot.getArmAssembly().flipUp();
                 flipPos = 0.7;
             }
 
             if(manualFlip > 0)
             {
                 flipPos = flipPos + 0.01;
-                roverRuckusBot.getArmAssembly().flip(flipPos);
+                roverRuckusBot.getArmAssembly().flipUp();
             }
 
 

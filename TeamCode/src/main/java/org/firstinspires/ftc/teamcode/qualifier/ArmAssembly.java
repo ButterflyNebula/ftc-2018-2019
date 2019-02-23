@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.qualifier.RobotHardware;
 
 public class ArmAssembly
 {
+    double upPosition = 0.1;
+    double downPosition = 1;
 
     RobotHardware robotHardware;
 
@@ -72,10 +74,11 @@ public class ArmAssembly
         robotHardware.intakeMineral.setPower(0);
     }
 
-    protected void flip (double position)
-    {
-        robotHardware.flipper.setPosition(position);
-    }
+    protected void flipUp () { robotHardware.flipper.setPosition(upPosition); }
+
+    protected void flipDown () { robotHardware.flipper.setPosition(downPosition); }
+
+    protected void flip(double position){robotHardware.flipper.setPosition(position);}
 
     protected void moveWrist (double power)
     {

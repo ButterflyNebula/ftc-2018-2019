@@ -555,7 +555,7 @@ public class Crater extends LinearOpMode
         robot.getArmAssembly().stopGrabberExtension();
         sleep(250);
 
-        robot.getArmAssembly().flip(0.7);
+        robot.getArmAssembly().flipUp();
         sleep(2000);
 
     }//end of release marker

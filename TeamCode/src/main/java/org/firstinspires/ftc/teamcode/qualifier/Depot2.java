@@ -215,10 +215,32 @@ public class Depot2 extends LinearOpMode
 
         laserDistance();
 
+        releaseMarker();
+
         encoderDrive(WHEEL_SPEED, distanceToCrater, 8);
 
+    }//end of place marker
+
+    /**
+     * RELEASE MARKER METHOD
+     */
+    private void releaseMarker()
+    {
+        runtime.reset();
+        while (opModeIsActive() && runtime.seconds() < 0.5)
+        {
+            robot.getArmAssembly().extendGrabber(0.8);
+        }
+        robot.getArmAssembly().stopGrabberExtension();
+
+        robot.getArmAssembly().flipUp();
+        sleep(500);
     }
 
+
+    /**
+     * WALL ALIGN METHOD
+     */
     private void wallAlign()
     {
         double angle = 5;
