@@ -86,7 +86,7 @@ public class Crater2 extends LinearOpMode
         robot.getChassisAssembly().changeToEncoderMode();
 
 
-        //  releaseRobot();
+        releaseRobot();
 
         moveFromLander();
 

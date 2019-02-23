@@ -33,41 +33,27 @@ public class TestServo extends LinearOpMode
             boolean thirty = gamepad1.a;
             boolean forty = gamepad1.b;
             boolean fifty = gamepad1.dpad_up;
-            boolean sixty = gamepad1.dpad_right;
-            boolean seventy = gamepad1.dpad_down;
-            boolean eighty = gamepad1.dpad_left;
+
 
             if(ten)
             {
-                roverRuckusBot.getArmAssembly().flip(0.1);
+                roverRuckusBot.getArmAssembly().flip(0.5);
             }
             else if(twenty)
             {
-                roverRuckusBot.getArmAssembly().flip(0.2);
+                roverRuckusBot.getArmAssembly().flip(0.95);
             }
             else if(thirty)
             {
-                roverRuckusBot.getArmAssembly().flip(0.3);
+                roverRuckusBot.getArmAssembly().flip(0.0);
             }
             else if(forty)
             {
-                roverRuckusBot.getArmAssembly().flip(0.4);
+                roverRuckusBot.getArmAssembly().flip(0.97);
             }
             else if(fifty)
             {
-                roverRuckusBot.getArmAssembly().flip(0.5);
-            }
-            else if(sixty)
-            {
-                roverRuckusBot.getArmAssembly().flip(0.6);
-            }
-            else if(seventy)
-            {
-                roverRuckusBot.getArmAssembly().flip(0.7);
-            }
-            else if(eighty)
-            {
-                roverRuckusBot.getArmAssembly().flip(0.8);
+                roverRuckusBot.getArmAssembly().flip(1);
             }
         }
     }

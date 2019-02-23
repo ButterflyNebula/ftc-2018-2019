@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.qualifier.RobotHardware;
 
 public class ArmAssembly
 {
-    double upPosition = 0.1;
-    double downPosition = 1;
+    double upPosition = 0.0;
+    double downPosition = 0.5;
 
     RobotHardware robotHardware;
 

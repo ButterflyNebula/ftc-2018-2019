@@ -80,7 +80,7 @@ public class Depot2 extends LinearOpMode
         robot.getChassisAssembly().changeToEncoderMode();
 
 
-        //  releaseRobot();
+        releaseRobot();
 
         moveFromLander();
 
