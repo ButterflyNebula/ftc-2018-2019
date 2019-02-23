@@ -17,12 +17,12 @@ public class Navigation
 
     protected double getCraterFrontDistance()
     {
-        return robotHardware.frontDistanceSensor.getDistance(DistanceUnit.INCH);
+        return robotHardware.frontCraterDistanceSensor.getDistance(DistanceUnit.INCH);
     }
 
     protected double getCraterBackDistance()
     {
-        return robotHardware.backDistanceSensor.getDistance(DistanceUnit.INCH);
+        return robotHardware.backCraterDistanceSensor.getDistance(DistanceUnit.INCH);
     }
 
     protected double getCraterAngle()
@@ -47,6 +47,45 @@ public class Navigation
         double backDistance = getCraterBackDistance();
 
         return 0.5 * (frontDistance + backDistance);
+    }
+
+    protected double getDepotFrontDistance()
+    {
+        return robotHardware.frontDepotDistanceSensor.getDistance(DistanceUnit.INCH);
+    }
+
+    protected double getDepotBackDistance()
+    {
+        return robotHardware.backDepotDistanceSensor.getDistance(DistanceUnit.INCH);
+    }
+
+    protected double getDepotAngle()
+    {
+        final double distanceBetweenSensors = 9;
+
+        double frontDistance = getDepotFrontDistance();
+        double backDistance = getDepotBackDistance();
+
+
+        double differenceInDistance = frontDistance - backDistance;
+
+        double angle = Math.asin(differenceInDistance/distanceBetweenSensors);
+        angle = Math.toDegrees(angle);
+
+        return angle;
+    }
+
+    protected double getDepotDistance()
+    {
+        double frontDistance = getDepotFrontDistance();
+        double backDistance = getDepotBackDistance();
+
+        return 0.5 * (frontDistance + backDistance);
+    }
+
+    protected double getLaserDistance()
+    {
+        return robotHardware.laserDistanceSensor.getDistance(DistanceUnit.INCH);
     }
 
 }

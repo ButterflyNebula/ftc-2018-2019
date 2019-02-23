@@ -6,6 +6,7 @@ package org.firstinspires.ftc.teamcode.qualifier;
 
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -41,8 +42,12 @@ public class RobotHardware
     public DigitalChannel wristTouchDown = null;
 
     //Distance Sensors
-    public ModernRoboticsI2cRangeSensor frontDistanceSensor = null;
-    public ModernRoboticsI2cRangeSensor backDistanceSensor = null;
+    public ModernRoboticsI2cRangeSensor frontCraterDistanceSensor = null;
+    public ModernRoboticsI2cRangeSensor backCraterDistanceSensor = null;
+    public ModernRoboticsI2cRangeSensor frontDepotDistanceSensor = null;
+    public ModernRoboticsI2cRangeSensor backDepotDistanceSensor = null;
+
+    public Rev2mDistanceSensor laserDistanceSensor = null;
 
 
 
@@ -65,12 +70,12 @@ public class RobotHardware
         frontLeftWheel.setDirection(DcMotor.Direction.REVERSE);
         backLeftWheel.setDirection(DcMotor.Direction.REVERSE);
 
-        /*
+
         frontLeftWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
         backLeftWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
         frontRightWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
         backRightWheel.setZeroPowerBehavior((DcMotor.ZeroPowerBehavior.BRAKE));
-        */
+
 
         //Lift
         robotLift = hwMap.get(DcMotor.class, "robotLift");
@@ -96,10 +101,13 @@ public class RobotHardware
 
 
         //Distance Sensors
-        frontDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class , "frontDistanceSensor");
-        backDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "backDistanceSensor");
+        frontCraterDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class , "frontCraterDistanceSensor");
+        backCraterDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "backCraterDistanceSensor");
 
+        frontDepotDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "frontDepotDistanceSensor");
+        backDepotDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "backDepotDistanceSensor");
 
+        laserDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "laserDistanceSensor");
 
     }
 

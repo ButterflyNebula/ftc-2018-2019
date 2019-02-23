@@ -13,7 +13,7 @@ import com.sun.source.tree.WhileLoopTree;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.qualifier.RoverRobot;
 
-@Autonomous(name="Crater2", group ="Tests")
+@Autonomous(name="Crater2", group ="Qualifier")
 public class Crater2 extends LinearOpMode
 {
 
@@ -29,7 +29,7 @@ public class Crater2 extends LinearOpMode
     double forwardDistance = 14;
     double distanceToWall = 40;
     double distanceToDepot = 42;
-    double distanceToCrater = -60;
+    double distanceToCrater = -65;
     double robotAngle = 0;
 
 
@@ -83,7 +83,10 @@ public class Crater2 extends LinearOpMode
             telemetry.update();
         }
 
-      //  releaseRobot();
+        robot.getChassisAssembly().changeToEncoderMode();
+
+
+        //  releaseRobot();
 
         moveFromLander();
 
@@ -129,7 +132,7 @@ public class Crater2 extends LinearOpMode
 
         encoderSide(WHEEL_SPEED , 15 , "LEFT" , 6);
         runtime.reset();
-        encoderDrive(WHEEL_SPEED , 8 , 5);
+        encoderDrive(WHEEL_SPEED , 6 , 5);
         robot.getChassisAssembly().stopMoving();
 
         encoderTurn(WHEEL_SPEED , angle , "LEFT" , 5);
@@ -143,7 +146,7 @@ public class Crater2 extends LinearOpMode
     private void hitGold()
     {
         double leftAngle = 50;
-        double rightAngle = 110;
+        double rightAngle = 95;
 
         boolean goldFound = false;
 
@@ -224,6 +227,8 @@ public class Crater2 extends LinearOpMode
 
         encoderDrive(WHEEL_SPEED, distanceToDepot, 8);
 
+        laserDistance();
+
         encoderDrive(WHEEL_SPEED, distanceToCrater, 10);
 
 
@@ -232,10 +237,6 @@ public class Crater2 extends LinearOpMode
 
     private void wallAlign()
     {
-        double minDistance = 5;
-        double frontDistance = 5;
-        double backDistance = 5;
-
         double angle = -10;
 
         runtime.reset();
@@ -243,7 +244,6 @@ public class Crater2 extends LinearOpMode
         {
             angle = robot.getNavigation().getCraterAngle();
         }
-
 
         if(Math.abs(angle) > 5)
         {
@@ -285,6 +285,27 @@ public class Crater2 extends LinearOpMode
         }
 
 
+    }//end of Wall Align
+
+    /**
+     * LASER DISTANCE METHOD
+     */
+    private void laserDistance()
+    {
+        double distance = 0;
+
+        runtime.reset();
+        while(opModeIsActive() && runtime.seconds() < 0.5)
+        {
+            distance = robot.getNavigation().getLaserDistance();
+        }
+
+        double distanceToDrive = distance - 24;
+
+        if(Math.abs(distanceToDrive) > 5)
+        {
+            encoderDrive(WHEEL_SPEED, distanceToDrive, 8);
+        }
     }
 
     /**

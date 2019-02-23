@@ -30,8 +30,8 @@ public class DistanceSensorTest extends LinearOpMode
 
         while(opModeIsActive())
         {
-            double frontDistance = robot.getChassisAssembly().robotHardware.frontDistanceSensor.getDistance(DistanceUnit.INCH);
-            double backDistance = robot.getChassisAssembly().robotHardware.backDistanceSensor.getDistance(DistanceUnit.INCH);
+            double frontDistance = robot.getChassisAssembly().robotHardware.frontDepotDistanceSensor.getDistance(DistanceUnit.INCH);
+            double backDistance = robot.getChassisAssembly().robotHardware.backDepotDistanceSensor.getDistance(DistanceUnit.INCH);
 
             telemetry.addData("Front Distance:", frontDistance);
             telemetry.addData("Back Distance" , backDistance);
@@ -42,7 +42,10 @@ public class DistanceSensorTest extends LinearOpMode
             double angle = Math.asin(differenceInDistance/distanceBetweenSensors);
             angle = Math.toDegrees(angle);
 
+            double distance = robot.getChassisAssembly().robotHardware.laserDistanceSensor.getDistance(DistanceUnit.INCH);
+
             telemetry.addData("Angle " , angle);
+            telemetry.addData("Distance", distance);
 
             telemetry.update();
         }
