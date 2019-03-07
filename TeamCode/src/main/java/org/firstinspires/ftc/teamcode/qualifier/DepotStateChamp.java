@@ -26,8 +26,8 @@ import java.util.Locale;
 
 import static java.lang.Math.abs;
 
-@Autonomous(name="Depot2", group ="Qualifier")
-@Disabled
+@Autonomous(name="DepotStateChamp", group ="Qualifier")
+//@Disabled
 public class DepotStateChamp extends LinearOpMode
 {
     //Creating a Rover robot object
@@ -47,7 +47,7 @@ public class DepotStateChamp extends LinearOpMode
     //Motion Variables
     int goldLoc = 0;
     double forwardDistance = 28;
-    double hitGoldDistance = 11;
+    double hitGoldDistance = 12;
     double distanceToCrater = -72;
     double robotAngle = 0;
 
@@ -75,6 +75,7 @@ public class DepotStateChamp extends LinearOpMode
     public void runOpMode()
     {
         robot.initRobot(hardwareMap);
+        imu = robot.getChassisAssembly().robotHardware.imu;
         // Set up detector
         detector = new GoldDetector(); // Create detector
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance(), 1, false); // Initialize it with the app context and camera
@@ -107,7 +108,7 @@ public class DepotStateChamp extends LinearOpMode
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         robot.getChassisAssembly().changeToEncoderMode();
 
-        //   releaseRobot();
+        releaseRobot();
         do
         {
             if(angles !=null) //completed integration - angles updated
@@ -119,10 +120,10 @@ public class DepotStateChamp extends LinearOpMode
             }
             else  //initialPos remains as 0
             {
-                sleep(50);
+                sleep(20);
             }
         }while (runtime.seconds() < 2);  // wait until imu completes AccelerationIntegration
-        Log.d("CraterStateChamp", "initialPos" + initialPos);
+        Log.d("DepotStateChamp", "initialPos" + initialPos);
 
         moveFromLander();
         sidewaysAlign();
@@ -183,12 +184,12 @@ public class DepotStateChamp extends LinearOpMode
             double newPos =  angles.firstAngle;
             telemetry.addData("newPos = " ,  newPos);
             telemetry.update();
-            Log.d("CraterStateChamp", "newPos = " +  newPos);
+            Log.d("DepotStateChamp", "newPos = " +  newPos);
 
             double angleDiff =  newStartPos- newPos;
             telemetry.addData("angleDiff = " ,  angleDiff);
             telemetry.update();
-            Log.d("CraterStateChamp", "angleDiff = " +  angleDiff);
+            Log.d("DepotStateChamp", "angleDiff = " +  angleDiff);
             if(angleDiff > 0){
                 telemetry.addData("turning right = " ,  "");
                 telemetry.update();
@@ -203,13 +204,13 @@ public class DepotStateChamp extends LinearOpMode
             newStartPos =  angles.firstAngle;
             telemetry.addData("newStartPos = " ,  newStartPos);
             telemetry.update();
-            Log.d("CraterStateChamp", "newStartPos = " +  newStartPos);
+            Log.d("DepotStateChamp", "newStartPos = " +  newStartPos);
         }
         catch (Exception ex)
         {
             telemetry.addData("imu not available for sideways correction " ,  "");
             telemetry.update();
-            Log.e("CraterStateChamp", "imu not available for sideways correction ");
+            Log.e("DepotStateChamp", "imu not available for sideways correction ");
         }
 
 
@@ -242,34 +243,31 @@ public class DepotStateChamp extends LinearOpMode
             {
                 telemetry.addData("Gold Found, Position is" , goldLoc);
                 telemetry.addData("Gold Loc: " , goldLoc);
-                telemetry.addData("Moving Forward" , "");
+                telemetry.addData("Moving sideways to hit gold" , "");
                 telemetry.update();
-                Log.d("CraterStateChamp", "goldFound = true");
+                Log.d("DepotStateChamp", "goldFound = true");
                 encoderSide(SIDE_WHEEL_SPEED , hitGoldDistance , "LEFT" , 6);
             }
             else
             {
-                Log.d("CraterStateChamp", "Gold Loc entering else:" + goldLoc);
+                Log.d("DepotStateChamp", "Gold Loc entering else:" + goldLoc);
                 if(goldLoc == 0)
                 {
                     telemetry.addData("Gold Loc: " , goldLoc);
-                    telemetry.addData("Moving Right" , "");
+                    telemetry.addData("Moving forward" , "");
                     telemetry.update();
                     //Move to Position 1
-                    encoderTurn(0.5, leftAngle, "LEFT", 5);
+                    encoderDrive(WHEEL_SPEED , 15 , 5);
                     goldLoc = 1;
-                    forwardDistance = 30;
-                    robotAngle = leftAngle;
                 }
                 else if(goldLoc == 1)
                 {
-                    //Move to Position 1
+                    //Move to Position 3
                     telemetry.addData("Gold Loc: " , goldLoc);
-                    telemetry.addData("Moving Left" , "");
+                    telemetry.addData("Moving backwards" , "");
                     telemetry.update();
-                    encoderTurn(0.5, rightAngle, "RIGHT", 8);
+                    encoderDrive(WHEEL_SPEED , -30 , 5);
                     goldLoc = -1;
-                    robotAngle = -leftAngle;
                 }
                 else
                 {
@@ -278,9 +276,12 @@ public class DepotStateChamp extends LinearOpMode
                     telemetry.addData("Couldn't find Gold - Defaulting Value to True " , goldLoc);
                     telemetry.update();
                 }
+                Log.d("DepotStateChamp", "Gold Loc exiting else:" + goldLoc);
             }
 
         }
+        runtime.reset();
+        encoderSide(SIDE_WHEEL_SPEED , hitGoldDistance  , "RIGHT" , 6);
 
 
     }//end of hitGold

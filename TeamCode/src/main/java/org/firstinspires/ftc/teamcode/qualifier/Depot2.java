@@ -14,7 +14,7 @@ import com.sun.source.tree.WhileLoopTree;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.qualifier.RoverRobot;
 
-@Autonomous(name="DepotStateChamp", group ="Qualifier")
+@Autonomous(name="Depot2", group ="Qualifier")
 @Disabled
 public class Depot2 extends LinearOpMode
 {
