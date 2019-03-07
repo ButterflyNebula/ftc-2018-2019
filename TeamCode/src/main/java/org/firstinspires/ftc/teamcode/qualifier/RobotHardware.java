@@ -5,6 +5,8 @@ package org.firstinspires.ftc.teamcode.qualifier;
  */
 
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -48,7 +50,8 @@ public class RobotHardware
     public ModernRoboticsI2cRangeSensor backDepotDistanceSensor = null;
 
     public Rev2mDistanceSensor laserDistanceSensor = null;
-
+    // The IMU sensor object
+    public BNO055IMU imu = null;
 
 
     //Adding the Hardware Map
@@ -108,6 +111,23 @@ public class RobotHardware
         backDepotDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "backDepotDistanceSensor");
 
         laserDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "laserDistanceSensor");
+
+        // Set up the parameters with which we will use our IMU. Note that integration
+        // algorithm here just reports accelerations to the logcat log; it doesn't actually
+        // provide positional information.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "RoverRuckus13747.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hwMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
     }
 

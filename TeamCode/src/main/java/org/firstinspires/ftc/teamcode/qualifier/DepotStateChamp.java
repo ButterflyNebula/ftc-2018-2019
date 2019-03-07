@@ -1,26 +1,44 @@
 package org.firstinspires.ftc.teamcode.qualifier;
 
+
+import android.util.Log;
+
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
-import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.sun.source.tree.WhileLoopTree;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.qualifier.RoverRobot;
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-@Autonomous(name="Crater2", group ="Qualifier")
+import java.util.Locale;
+
+import static java.lang.Math.abs;
+
+@Autonomous(name="Depot2", group ="Qualifier")
 @Disabled
-public class Crater2 extends LinearOpMode
+public class DepotStateChamp extends LinearOpMode
 {
-
     //Creating a Rover robot object
     RoverRobot robot = new RoverRobot();
+
+    // The IMU sensor object
+    BNO055IMU imu;
+
+    // State used for updating telemetry
+    Orientation angles;
+    Acceleration gravity;
 
     private GoldDetector detector;
 
@@ -28,17 +46,14 @@ public class Crater2 extends LinearOpMode
 
     //Motion Variables
     int goldLoc = 0;
-    double forwardDistance = 14;
-    double distanceToWall = 40;
-    double distanceToDepot = 42;
+    double forwardDistance = 28;
+    double hitGoldDistance = 11;
     double distanceToCrater = -72;
     double robotAngle = 0;
 
-
-
-    //Sensor Constants
-    private static final double distanceBetweenSensors = 9;
-
+    //heading angle tracking values
+    double initialPos = 0;
+    double newStartPos = 0;
 
     //Encoder Constants
     private static final double COUNTS_PER_MOTOR_REV = 1120;
@@ -53,6 +68,7 @@ public class Crater2 extends LinearOpMode
     private static final double COUNTS_PER_SIDE_INCH = 100;
 
     private static final double WHEEL_SPEED = 1;
+    private static final double SIDE_WHEEL_SPEED = 0.8;
 
 
     @Override
@@ -84,17 +100,38 @@ public class Crater2 extends LinearOpMode
             telemetry.addData("status" , "waiting for start command...");
             telemetry.update();
         }
-
+        // Set up our telemetry dashboard
+        composeTelemetry();
+        telemetry.update();
+        // Start the logging of measured acceleration
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         robot.getChassisAssembly().changeToEncoderMode();
 
-
-     //   releaseRobot();
+        //   releaseRobot();
+        do
+        {
+            if(angles !=null) //completed integration - angles updated
+            {
+                initialPos = angles.firstAngle;
+                telemetry.addData("initialPos = " ,  initialPos);
+                telemetry.update();
+                break;
+            }
+            else  //initialPos remains as 0
+            {
+                sleep(50);
+            }
+        }while (runtime.seconds() < 2);  // wait until imu completes AccelerationIntegration
+        Log.d("CraterStateChamp", "initialPos" + initialPos);
 
         moveFromLander();
-
+        sidewaysAlign();
         hitGold();
+        sidewaysAlign();
 
-        placeMarker();
+
+        sleep (10000);
+        //placeMarker();
 
 
         detector.disable();
@@ -130,16 +167,53 @@ public class Crater2 extends LinearOpMode
      */
     private void moveFromLander()
     {
-        double angle = 90;
-
         encoderSide(WHEEL_SPEED , 15 , "LEFT" , 6);
-        runtime.reset();
         encoderDrive(WHEEL_SPEED , 6 , 5);
-        robot.getChassisAssembly().stopMoving();
-
-        encoderTurn(0.5 , angle , "LEFT" , 5);
 
     }//end of moveFromLander
+
+
+    /**
+     * Sideways align
+     */
+    private void sidewaysAlign()
+    {
+        try
+        {
+            double newPos =  angles.firstAngle;
+            telemetry.addData("newPos = " ,  newPos);
+            telemetry.update();
+            Log.d("CraterStateChamp", "newPos = " +  newPos);
+
+            double angleDiff =  newStartPos- newPos;
+            telemetry.addData("angleDiff = " ,  angleDiff);
+            telemetry.update();
+            Log.d("CraterStateChamp", "angleDiff = " +  angleDiff);
+            if(angleDiff > 0){
+                telemetry.addData("turning right = " ,  "");
+                telemetry.update();
+                encoderTurn(SIDE_WHEEL_SPEED,abs(angleDiff), "LEFT",5);
+            }
+            else if( angleDiff < 0)
+            {
+                telemetry.addData("turning left = " ,  "");
+                telemetry.update();
+                encoderTurn(SIDE_WHEEL_SPEED,abs(angleDiff), "RIGHT",5);
+            }
+            newStartPos =  angles.firstAngle;
+            telemetry.addData("newStartPos = " ,  newStartPos);
+            telemetry.update();
+            Log.d("CraterStateChamp", "newStartPos = " +  newStartPos);
+        }
+        catch (Exception ex)
+        {
+            telemetry.addData("imu not available for sideways correction " ,  "");
+            telemetry.update();
+            Log.e("CraterStateChamp", "imu not available for sideways correction ");
+        }
+
+
+    }//end of sidewaysAlign
 
 
     /**
@@ -170,10 +244,12 @@ public class Crater2 extends LinearOpMode
                 telemetry.addData("Gold Loc: " , goldLoc);
                 telemetry.addData("Moving Forward" , "");
                 telemetry.update();
-                encoderDrive(WHEEL_SPEED , forwardDistance , 5);
+                Log.d("CraterStateChamp", "goldFound = true");
+                encoderSide(SIDE_WHEEL_SPEED , hitGoldDistance , "LEFT" , 6);
             }
             else
             {
+                Log.d("CraterStateChamp", "Gold Loc entering else:" + goldLoc);
                 if(goldLoc == 0)
                 {
                     telemetry.addData("Gold Loc: " , goldLoc);
@@ -182,7 +258,7 @@ public class Crater2 extends LinearOpMode
                     //Move to Position 1
                     encoderTurn(0.5, leftAngle, "LEFT", 5);
                     goldLoc = 1;
-                    forwardDistance = 20;
+                    forwardDistance = 30;
                     robotAngle = leftAngle;
                 }
                 else if(goldLoc == 1)
@@ -206,7 +282,6 @@ public class Crater2 extends LinearOpMode
 
         }
 
-        encoderDrive(WHEEL_SPEED, -(forwardDistance - 2), 5);
 
     }//end of hitGold
 
@@ -216,28 +291,19 @@ public class Crater2 extends LinearOpMode
      */
     private void placeMarker()
     {
+        double angleToTurn = 45 + robotAngle;
 
-        double angleToTurn = 80 - robotAngle;
-
-        encoderTurn(WHEEL_SPEED, angleToTurn, "LEFT", 8);
-
-        encoderDrive(WHEEL_SPEED , distanceToWall , 7);
-
-        encoderTurn(WHEEL_SPEED , 45 , "LEFT", 6);
+        encoderTurn(WHEEL_SPEED, angleToTurn, "RIGHT", 5);
 
         wallAlign();
-
-        encoderDrive(WHEEL_SPEED, distanceToDepot, 8);
 
         laserDistance();
 
       //  releaseMarker();
 
-        encoderDrive(WHEEL_SPEED, distanceToCrater, 10);
+        encoderDrive(WHEEL_SPEED, distanceToCrater, 8);
 
-
-
-    }//end of Place Marker
+    }//end of place marker
 
     /**
      * RELEASE MARKER METHOD
@@ -252,29 +318,33 @@ public class Crater2 extends LinearOpMode
         robot.getArmAssembly().stopGrabberExtension();
 
         robot.getArmAssembly().flipUp();
-        sleep(1000);
+        sleep(1500);
     }
 
+
+    /**
+     * WALL ALIGN METHOD
+     */
     private void wallAlign()
     {
-        double angle = -10;
+        double angle = 5;
 
         runtime.reset();
         while (opModeIsActive() && runtime.seconds() < 0.5)
         {
-            angle = robot.getNavigation().getCraterAngle();
+            angle = robot.getNavigation().getDepotAngle();
         }
 
         if(Math.abs(angle) > 5)
         {
-            encoderTurn(WHEEL_SPEED, angle, "RIGHT", 5);
+            encoderTurn(WHEEL_SPEED, angle, "LEFT", 5);
         }
 
         double distance = 10;
         runtime.reset();
         while (opModeIsActive() && runtime.seconds() < 0.5)
         {
-            distance = robot.getNavigation().getCraterDistance();
+            distance = robot.getNavigation().getDepotDistance();
 
         }
 
@@ -283,11 +353,11 @@ public class Crater2 extends LinearOpMode
 
         if(distance > 5)
         {
-            double distanceToDrive = distance - 5;
+            double distanceToDrive = distance - 2;
 
             if(distanceToDrive > 2)
             {
-                encoderSide(WHEEL_SPEED , distanceToDrive , "RIGHT" , 5);
+                encoderSide(WHEEL_SPEED , distanceToDrive , "LEFT" , 5);
             }
         }
 
@@ -295,17 +365,20 @@ public class Crater2 extends LinearOpMode
         runtime.reset();
         while (opModeIsActive() && runtime.seconds() < 0.5)
         {
-            angle = robot.getNavigation().getCraterAngle();
+            angle = robot.getNavigation().getDepotAngle();
         }
 
 
         if(Math.abs(angle) > 3)
         {
-            encoderTurn(WHEEL_SPEED, angle, "RIGHT", 5);
+            encoderTurn(WHEEL_SPEED, angle, "LEFT", 5);
         }
 
-
-    }//end of Wall Align
+        if(goldLoc == 1)
+        {
+            encoderSide(WHEEL_SPEED, 4, "RIGHT", 5);
+        }
+    }
 
     /**
      * LASER DISTANCE METHOD
@@ -327,6 +400,8 @@ public class Crater2 extends LinearOpMode
             encoderDrive(WHEEL_SPEED, distanceToDrive, 8);
         }
     }
+
+
 
     /**
      *ENCODER DRIVE METHOD
@@ -551,6 +626,81 @@ public class Crater2 extends LinearOpMode
 
     }//end of encoderSide
 
+
+    //----------------------------------------------------------------------------------------------
+    // Telemetry Configuration
+    //----------------------------------------------------------------------------------------------
+
+    void composeTelemetry() {
+
+        // At the beginning of each telemetry update, grab a bunch of data
+        // from the IMU that we will then display in separate lines.
+        telemetry.addAction(new Runnable() { @Override public void run()
+        {
+            // Acquiring the angles is relatively expensive; we don't want
+            // to do that in each of the three items that need that info, as that's
+            // three times the necessary expense.
+            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            gravity  = imu.getGravity();
+        }
+        });
+
+        telemetry.addLine()
+                .addData("status", new Func<String>() {
+                    @Override public String value() {
+                        return imu.getSystemStatus().toShortString();
+                    }
+                })
+                .addData("calib", new Func<String>() {
+                    @Override public String value() {
+                        return imu.getCalibrationStatus().toString();
+                    }
+                });
+
+        telemetry.addLine()
+                .addData("heading", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.firstAngle);
+                    }
+                })
+                .addData("roll", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.secondAngle);
+                    }
+                })
+                .addData("pitch", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.thirdAngle);
+                    }
+                });
+
+        telemetry.addLine()
+                .addData("grvty", new Func<String>() {
+                    @Override public String value() {
+                        return gravity.toString();
+                    }
+                })
+                .addData("mag", new Func<String>() {
+                    @Override public String value() {
+                        return String.format(Locale.getDefault(), "%.3f",
+                                Math.sqrt(gravity.xAccel*gravity.xAccel
+                                        + gravity.yAccel*gravity.yAccel
+                                        + gravity.zAccel*gravity.zAccel));
+                    }
+                });
+    }
+
+    //----------------------------------------------------------------------------------------------
+    // Formatting
+    //----------------------------------------------------------------------------------------------
+
+    String formatAngle(AngleUnit angleUnit, double angle) {
+        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+    }
+
+    String formatDegrees(double degrees){
+        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
+    }
 
 
 

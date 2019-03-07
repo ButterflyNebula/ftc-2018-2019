@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.qualifier;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -7,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="DistanceSensor", group ="Tests")
+@Disabled
 public class DistanceSensorTest extends LinearOpMode
 {
 
@@ -30,25 +32,41 @@ public class DistanceSensorTest extends LinearOpMode
 
         while(opModeIsActive())
         {
-            double frontDistance = robot.getChassisAssembly().robotHardware.frontDepotDistanceSensor.getDistance(DistanceUnit.INCH);
-            double backDistance = robot.getChassisAssembly().robotHardware.backDepotDistanceSensor.getDistance(DistanceUnit.INCH);
+            double frontDepotDistance = robot.getChassisAssembly().robotHardware.frontDepotDistanceSensor.getDistance(DistanceUnit.INCH);
+            double backDepotDistance = robot.getChassisAssembly().robotHardware.backDepotDistanceSensor.getDistance(DistanceUnit.INCH);
 
-            telemetry.addData("Front Distance:", frontDistance);
-            telemetry.addData("Back Distance" , backDistance);
+            telemetry.addData("Front Depot Distance:", frontDepotDistance);
+            telemetry.addData("Back Depot Distance" , frontDepotDistance);
 
 
-            double differenceInDistance = frontDistance - backDistance;
+            double differenceInDepotDistance = frontDepotDistance - backDepotDistance;
 
-            double angle = Math.atan(differenceInDistance/distanceBetweenSensors);
-            angle = Math.toDegrees(angle);
-            double angle2 = Math.asin(differenceInDistance/distanceBetweenSensors);
-            angle2 = Math.toDegrees(angle2);
+            double angleDepot = Math.atan(differenceInDepotDistance/distanceBetweenSensors);
+            angleDepot = Math.toDegrees(angleDepot);
 
             double distance = robot.getChassisAssembly().robotHardware.laserDistanceSensor.getDistance(DistanceUnit.INCH);
 
-            telemetry.addData("Angle (tan) " , angle);
-            telemetry.addData("Angle (sin)" , angle2);
+
+            telemetry.addData("Angle (depot) " , angleDepot);
+
             telemetry.addData("Distance", distance);
+
+
+            //Crater
+            double frontCraterDistance = robot.getChassisAssembly().robotHardware.frontCraterDistanceSensor.getDistance(DistanceUnit.INCH);
+            double backCraterDistance = robot.getChassisAssembly().robotHardware.backCraterDistanceSensor.getDistance(DistanceUnit.INCH);
+
+            telemetry.addData("Front Crater Distance:", frontCraterDistance);
+            telemetry.addData("Back Crater Distance" , backCraterDistance);
+
+
+            double differenceInCraterDistance = frontCraterDistance - backCraterDistance;
+
+            double angleCrater = Math.atan(differenceInCraterDistance/distanceBetweenSensors);
+            angleCrater = Math.toDegrees(angleCrater);
+
+            telemetry.addData("Angle (crater) " , angleCrater);
+
 
             telemetry.update();
         }

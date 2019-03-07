@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.qualifier;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "testservo", group = "Tests")
+@Disabled
 public class TestServo extends LinearOpMode
 {
 

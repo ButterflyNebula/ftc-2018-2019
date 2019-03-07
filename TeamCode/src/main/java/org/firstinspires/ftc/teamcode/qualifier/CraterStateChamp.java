@@ -1,26 +1,44 @@
 package org.firstinspires.ftc.teamcode.qualifier;
 
+import android.util.Log;
+
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
-import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.sun.source.tree.WhileLoopTree;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.qualifier.RoverRobot;
 
-@Autonomous(name="Crater2", group ="Qualifier")
-@Disabled
-public class Crater2 extends LinearOpMode
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+
+import java.util.Locale;
+
+import static java.lang.Math.abs;
+
+@Autonomous(name="CraterStateChamp", group ="Qualifier")
+//@Disabled
+public class CraterStateChamp extends LinearOpMode
 {
-
     //Creating a Rover robot object
-    RoverRobot robot = new RoverRobot();
+    private RoverRobot robot = new RoverRobot();
+    // The IMU sensor object
+    BNO055IMU imu;
+
+    // State used for updating telemetry
+    Orientation angles;
+    Acceleration gravity;
 
     private GoldDetector detector;
 
@@ -29,12 +47,15 @@ public class Crater2 extends LinearOpMode
     //Motion Variables
     int goldLoc = 0;
     double forwardDistance = 14;
+    double hitGoldDistance = 11;
     double distanceToWall = 40;
     double distanceToDepot = 42;
     double distanceToCrater = -72;
     double robotAngle = 0;
 
-
+    //heading angle tracking values
+    double initialPos = 0;
+    double newStartPos = 0;
 
     //Sensor Constants
     private static final double distanceBetweenSensors = 9;
@@ -53,12 +74,14 @@ public class Crater2 extends LinearOpMode
     private static final double COUNTS_PER_SIDE_INCH = 100;
 
     private static final double WHEEL_SPEED = 1;
+    private static final double SIDE_WHEEL_SPEED = 0.8;
 
 
     @Override
     public void runOpMode()
     {
         robot.initRobot(hardwareMap);
+        imu = robot.getChassisAssembly().robotHardware.imu;
         // Set up detector
         detector = new GoldDetector(); // Create detector
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance(), 1, false); // Initialize it with the app context and camera
@@ -79,22 +102,47 @@ public class Crater2 extends LinearOpMode
         //Wait for Start
         telemetry.addData(">", "Press Play to begin");
         telemetry.update();
+
         while (!opModeIsActive() && !isStopRequested())
         {
             telemetry.addData("status" , "waiting for start command...");
             telemetry.update();
         }
+        //waitForStart();
 
+        // Set up our telemetry dashboard
+        composeTelemetry();
+        telemetry.update();
+        // Start the logging of measured acceleration
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         robot.getChassisAssembly().changeToEncoderMode();
 
-
-     //   releaseRobot();
+         //   releaseRobot();
+        do
+        {
+            if(angles !=null) //completed integration - angles updated
+            {
+                initialPos = angles.firstAngle;
+                telemetry.addData("initialPos = " ,  initialPos);
+                telemetry.update();
+                break;
+            }
+            else  //initialPos remains as 0
+            {
+                sleep(50);
+            }
+        }while (runtime.seconds() < 2);  // wait until imu completes AccelerationIntegration
+        Log.d("CraterStateChamp", "initialPos" + initialPos);
 
         moveFromLander();
-
+        sidewaysAlign();
         hitGold();
+        sidewaysAlign();
 
-        placeMarker();
+
+        sleep (10000);
+
+    //    placeMarker();
 
 
         detector.disable();
@@ -130,16 +178,52 @@ public class Crater2 extends LinearOpMode
      */
     private void moveFromLander()
     {
-        double angle = 90;
-
         encoderSide(WHEEL_SPEED , 15 , "LEFT" , 6);
-        runtime.reset();
         encoderDrive(WHEEL_SPEED , 6 , 5);
-        robot.getChassisAssembly().stopMoving();
-
-        encoderTurn(0.5 , angle , "LEFT" , 5);
 
     }//end of moveFromLander
+
+    /**
+     * Sideways align
+     */
+    private void sidewaysAlign()
+    {
+        try
+        {
+            double newPos =  angles.firstAngle;
+            telemetry.addData("newPos = " ,  newPos);
+            telemetry.update();
+            Log.d("CraterStateChamp", "newPos = " +  newPos);
+
+            double angleDiff =  newStartPos- newPos;
+            telemetry.addData("angleDiff = " ,  angleDiff);
+            telemetry.update();
+            Log.d("CraterStateChamp", "angleDiff = " +  angleDiff);
+            if(angleDiff > 0){
+                telemetry.addData("turning right = " ,  "");
+                telemetry.update();
+                encoderTurn(SIDE_WHEEL_SPEED,abs(angleDiff), "LEFT",5);
+            }
+            else if( angleDiff < 0)
+            {
+                telemetry.addData("turning left = " ,  "");
+                telemetry.update();
+                encoderTurn(SIDE_WHEEL_SPEED,abs(angleDiff), "RIGHT",5);
+            }
+            newStartPos =  angles.firstAngle;
+            telemetry.addData("newStartPos = " ,  newStartPos);
+            telemetry.update();
+            Log.d("CraterStateChamp", "newStartPos = " +  newStartPos);
+        }
+        catch (Exception ex)
+        {
+            telemetry.addData("imu not available for sideways correction " ,  "");
+            telemetry.update();
+            Log.e("CraterStateChamp", "imu not available for sideways correction ");
+        }
+
+
+    }//end of sidewaysAlign
 
 
     /**
@@ -160,7 +244,7 @@ public class Crater2 extends LinearOpMode
                 goldFound = detector.isFound();
             }
 
-            if(goldLoc == -1)
+            if(goldLoc == -1)  //implies gold is sensed
             {
                 goldFound = true;
             }
@@ -168,32 +252,31 @@ public class Crater2 extends LinearOpMode
             {
                 telemetry.addData("Gold Found, Position is" , goldLoc);
                 telemetry.addData("Gold Loc: " , goldLoc);
-                telemetry.addData("Moving Forward" , "");
+                telemetry.addData("Moving sideways to hit gold" , "");
                 telemetry.update();
-                encoderDrive(WHEEL_SPEED , forwardDistance , 5);
+                Log.d("CraterStateChamp", "goldFound = true");
+                encoderSide(SIDE_WHEEL_SPEED , hitGoldDistance , "LEFT" , 6);
             }
             else
             {
+                Log.d("CraterStateChamp", "Gold Loc entering else:" + goldLoc);
                 if(goldLoc == 0)
                 {
                     telemetry.addData("Gold Loc: " , goldLoc);
-                    telemetry.addData("Moving Right" , "");
+                    telemetry.addData("Moving forward" , "");
                     telemetry.update();
                     //Move to Position 1
-                    encoderTurn(0.5, leftAngle, "LEFT", 5);
+                    encoderDrive(WHEEL_SPEED , 14 , 5);
                     goldLoc = 1;
-                    forwardDistance = 20;
-                    robotAngle = leftAngle;
                 }
                 else if(goldLoc == 1)
                 {
-                    //Move to Position 1
+                    //Move to Position 3
                     telemetry.addData("Gold Loc: " , goldLoc);
-                    telemetry.addData("Moving Left" , "");
+                    telemetry.addData("Moving backwards" , "");
                     telemetry.update();
-                    encoderTurn(0.5, rightAngle, "RIGHT", 8);
+                    encoderDrive(WHEEL_SPEED , -28 , 5);
                     goldLoc = -1;
-                    robotAngle = -leftAngle;
                 }
                 else
                 {
@@ -202,11 +285,12 @@ public class Crater2 extends LinearOpMode
                     telemetry.addData("Couldn't find Gold - Defaulting Value to True " , goldLoc);
                     telemetry.update();
                 }
+                Log.d("CraterStateChamp", "Gold Loc exiting else:" + goldLoc);
             }
 
         }
-
-        encoderDrive(WHEEL_SPEED, -(forwardDistance - 2), 5);
+        runtime.reset();
+        encoderSide(SIDE_WHEEL_SPEED , hitGoldDistance  , "RIGHT" , 6);
 
     }//end of hitGold
 
@@ -265,7 +349,7 @@ public class Crater2 extends LinearOpMode
             angle = robot.getNavigation().getCraterAngle();
         }
 
-        if(Math.abs(angle) > 5)
+        if(abs(angle) > 5)
         {
             encoderTurn(WHEEL_SPEED, angle, "RIGHT", 5);
         }
@@ -299,7 +383,7 @@ public class Crater2 extends LinearOpMode
         }
 
 
-        if(Math.abs(angle) > 3)
+        if(abs(angle) > 3)
         {
             encoderTurn(WHEEL_SPEED, angle, "RIGHT", 5);
         }
@@ -322,7 +406,7 @@ public class Crater2 extends LinearOpMode
 
         double distanceToDrive = distance - 20;
 
-        if(Math.abs(distanceToDrive) > 5)
+        if(abs(distanceToDrive) > 5)
         {
             encoderDrive(WHEEL_SPEED, distanceToDrive, 8);
         }
@@ -344,6 +428,7 @@ public class Crater2 extends LinearOpMode
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
+            //robot.getChassisAssembly().changeToEncoderMode();
 
             // Determine new target position, and pass to motor controller
             newBackLeftTarget = robot.getChassisAssembly().getBackLeftWheelCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
@@ -364,10 +449,10 @@ public class Crater2 extends LinearOpMode
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.getChassisAssembly().setBackLeftWheelPower(Math.abs(speed));
-            robot.getChassisAssembly().setBackRightWheelPower(Math.abs(speed));
-            robot.getChassisAssembly().setFrontLeftWheelPower(Math.abs(speed));
-            robot.getChassisAssembly().setFrontRightWheelPower(Math.abs(speed));
+            robot.getChassisAssembly().setBackLeftWheelPower(abs(speed));
+            robot.getChassisAssembly().setBackRightWheelPower(abs(speed));
+            robot.getChassisAssembly().setFrontLeftWheelPower(abs(speed));
+            robot.getChassisAssembly().setFrontRightWheelPower(abs(speed));
 
 
             // keep looping while we are still active, and there is time left, and both motors are running.
@@ -414,9 +499,10 @@ public class Crater2 extends LinearOpMode
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
+           // robot.getChassisAssembly().changeToEncoderMode();
 
             // Determine new target position, and pass to motor controller
-            if(direction == "LEFT")
+            if(direction.equalsIgnoreCase( "LEFT"))
             {
                 newBackLeftTarget = robot.getChassisAssembly().getBackLeftWheelCurrentPosition() + (int) (-degrees * COUNTS_PER_DEGREE);
                 newBackRightTarget = robot.getChassisAssembly().getBackRightWheelCurrentPosition() + (int) (degrees * COUNTS_PER_DEGREE);
@@ -442,10 +528,10 @@ public class Crater2 extends LinearOpMode
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.getChassisAssembly().setBackLeftWheelPower(Math.abs(speed));
-            robot.getChassisAssembly().setBackRightWheelPower(Math.abs(speed));
-            robot.getChassisAssembly().setFrontLeftWheelPower(Math.abs(speed));
-            robot.getChassisAssembly().setFrontRightWheelPower(Math.abs(speed));
+            robot.getChassisAssembly().setBackLeftWheelPower(abs(speed));
+            robot.getChassisAssembly().setBackRightWheelPower(abs(speed));
+            robot.getChassisAssembly().setFrontLeftWheelPower(abs(speed));
+            robot.getChassisAssembly().setFrontRightWheelPower(abs(speed));
 
 
             // keep looping while we are still active, and there is time left, and both motors are running.
@@ -491,8 +577,9 @@ public class Crater2 extends LinearOpMode
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
+           // robot.getChassisAssembly().changeToEncoderMode();
             // Determine new target position, and pass to motor controller
-            if(direction == "RIGHT")
+            if(direction.equalsIgnoreCase( "RIGHT"))
             {
                 newBackLeftTarget = robot.getChassisAssembly().getBackLeftWheelCurrentPosition() + (int) (-inches * COUNTS_PER_SIDE_INCH);
                 newBackRightTarget = robot.getChassisAssembly().getBackRightWheelCurrentPosition() + (int) (inches * COUNTS_PER_SIDE_INCH);
@@ -519,10 +606,10 @@ public class Crater2 extends LinearOpMode
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.getChassisAssembly().setBackLeftWheelPower(Math.abs(speed));
-            robot.getChassisAssembly().setBackRightWheelPower(Math.abs(speed));
-            robot.getChassisAssembly().setFrontLeftWheelPower(Math.abs(speed));
-            robot.getChassisAssembly().setFrontRightWheelPower(Math.abs(speed));
+            robot.getChassisAssembly().setBackLeftWheelPower(abs(speed));
+            robot.getChassisAssembly().setBackRightWheelPower(abs(speed));
+            robot.getChassisAssembly().setFrontLeftWheelPower(abs(speed));
+            robot.getChassisAssembly().setFrontRightWheelPower(abs(speed));
 
 
             // keep looping while we are still active, and there is time left, and both motors are running.
@@ -552,7 +639,80 @@ public class Crater2 extends LinearOpMode
     }//end of encoderSide
 
 
+    //----------------------------------------------------------------------------------------------
+    // Telemetry Configuration
+    //----------------------------------------------------------------------------------------------
 
+    void composeTelemetry() {
+
+        // At the beginning of each telemetry update, grab a bunch of data
+        // from the IMU that we will then display in separate lines.
+        telemetry.addAction(new Runnable() { @Override public void run()
+        {
+            // Acquiring the angles is relatively expensive; we don't want
+            // to do that in each of the three items that need that info, as that's
+            // three times the necessary expense.
+            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            gravity  = imu.getGravity();
+        }
+        });
+
+        telemetry.addLine()
+                .addData("status", new Func<String>() {
+                    @Override public String value() {
+                        return imu.getSystemStatus().toShortString();
+                    }
+                })
+                .addData("calib", new Func<String>() {
+                    @Override public String value() {
+                        return imu.getCalibrationStatus().toString();
+                    }
+                });
+
+        telemetry.addLine()
+                .addData("heading", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.firstAngle);
+                    }
+                })
+                .addData("roll", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.secondAngle);
+                    }
+                })
+                .addData("pitch", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.thirdAngle);
+                    }
+                });
+
+        telemetry.addLine()
+                .addData("grvty", new Func<String>() {
+                    @Override public String value() {
+                        return gravity.toString();
+                    }
+                })
+                .addData("mag", new Func<String>() {
+                    @Override public String value() {
+                        return String.format(Locale.getDefault(), "%.3f",
+                                Math.sqrt(gravity.xAccel*gravity.xAccel
+                                        + gravity.yAccel*gravity.yAccel
+                                        + gravity.zAccel*gravity.zAccel));
+                    }
+                });
+    }
+
+    //----------------------------------------------------------------------------------------------
+    // Formatting
+    //----------------------------------------------------------------------------------------------
+
+    String formatAngle(AngleUnit angleUnit, double angle) {
+        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+    }
+
+    String formatDegrees(double degrees){
+        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
+    }
 
 
 }

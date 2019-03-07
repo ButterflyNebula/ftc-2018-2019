@@ -65,6 +65,8 @@ public class TeleOpMode extends LinearOpMode {
             float manualWristDown = gamepad2.right_trigger;
             float manualWristUp = gamepad2.left_trigger;
             boolean depositReturn = gamepad2.b;
+            double intake2 = gamepad2.left_stick_y;
+            double manualLift = gamepad2.right_stick_y;
 
 
 
@@ -118,10 +120,10 @@ public class TeleOpMode extends LinearOpMode {
 
 
             //Intake
-            if (outtake) {
+            if (outtake || intake2 < 0) {
                 roverRuckusBot.getArmAssembly().outTakeMineral(1.0);
             }
-            else if (intake || intakeOn) {
+            else if (intake || intakeOn || intake2 > 0) {
                 roverRuckusBot.getArmAssembly().intakeMineral(1.0);
             }
              else {
@@ -139,6 +141,7 @@ public class TeleOpMode extends LinearOpMode {
             } else {
                 roverRuckusBot.getArmAssembly().stopGrabberExtension();
             }
+
 
             //Extending the Deposit
             if (extendDeposit)
@@ -158,11 +161,19 @@ public class TeleOpMode extends LinearOpMode {
                 roverRuckusBot.getArmAssembly().stopDepositExtension();
             }
 
+            //Lifting the Deposit (Manually)
+            if(manualLift > 0)
+            {
+                roverRuckusBot.getArmAssembly().extendDeposit(manualLift);
+            }
 
             //Retracting the Deposit (Automatically)
             if(depositReturn)
             {
-                roverRuckusBot.getArmAssembly().flipDown();
+                while(opModeIsActive() && roverRuckusBot.getArmAssembly().robotHardware.flipper.getPosition() != roverRuckusBot.getArmAssembly().downPosition)
+                {
+                    roverRuckusBot.getArmAssembly().flipDown();
+                }
                 flipPos = 0.09;
 
                 runtime.reset();
@@ -180,6 +191,8 @@ public class TeleOpMode extends LinearOpMode {
                 }
                 roverRuckusBot.getArmAssembly().stopDepositExtension();
             }
+
+
 
             //Flipping to Deposit the Minerals
             if (flip) {

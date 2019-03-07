@@ -5,6 +5,7 @@ import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -13,7 +14,8 @@ import com.sun.source.tree.WhileLoopTree;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.qualifier.RoverRobot;
 
-@Autonomous(name="Depot2", group ="Qualifier")
+@Autonomous(name="DepotStateChamp", group ="Qualifier")
+@Disabled
 public class Depot2 extends LinearOpMode
 {
 
@@ -27,9 +29,7 @@ public class Depot2 extends LinearOpMode
     //Motion Variables
     int goldLoc = 0;
     double forwardDistance = 28;
-    double distanceToWall = 40;
-    double distanceToDepot = 42;
-    double distanceToCrater = -65;
+    double distanceToCrater = -72;
     double robotAngle = 0;
 
 
@@ -80,7 +80,7 @@ public class Depot2 extends LinearOpMode
         robot.getChassisAssembly().changeToEncoderMode();
 
 
-        releaseRobot();
+      //  releaseRobot();
 
         moveFromLander();
 
@@ -129,7 +129,7 @@ public class Depot2 extends LinearOpMode
         encoderDrive(WHEEL_SPEED , 6 , 5);
         robot.getChassisAssembly().stopMoving();
 
-        encoderTurn(WHEEL_SPEED , angle , "LEFT" , 5);
+        encoderTurn(0.5 , angle , "LEFT" , 5);
 
     }//end of moveFromLander
 
@@ -139,8 +139,8 @@ public class Depot2 extends LinearOpMode
      */
     private void hitGold()
     {
-        double leftAngle = 50;
-        double rightAngle = 95;
+        double leftAngle = 55;
+        double rightAngle = 110;
 
         boolean goldFound = false;
 
@@ -172,7 +172,7 @@ public class Depot2 extends LinearOpMode
                     telemetry.addData("Moving Right" , "");
                     telemetry.update();
                     //Move to Position 1
-                    encoderTurn(WHEEL_SPEED, leftAngle, "LEFT", 5);
+                    encoderTurn(0.5, leftAngle, "LEFT", 5);
                     goldLoc = 1;
                     forwardDistance = 30;
                     robotAngle = leftAngle;
@@ -183,7 +183,7 @@ public class Depot2 extends LinearOpMode
                     telemetry.addData("Gold Loc: " , goldLoc);
                     telemetry.addData("Moving Left" , "");
                     telemetry.update();
-                    encoderTurn(WHEEL_SPEED, rightAngle, "RIGHT", 8);
+                    encoderTurn(0.5, rightAngle, "RIGHT", 8);
                     goldLoc = -1;
                     robotAngle = -leftAngle;
                 }
@@ -215,7 +215,7 @@ public class Depot2 extends LinearOpMode
 
         laserDistance();
 
-        releaseMarker();
+      //  releaseMarker();
 
         encoderDrive(WHEEL_SPEED, distanceToCrater, 8);
 
@@ -227,14 +227,14 @@ public class Depot2 extends LinearOpMode
     private void releaseMarker()
     {
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.5)
+        while (opModeIsActive() && runtime.seconds() < 0.75)
         {
             robot.getArmAssembly().extendGrabber(0.8);
         }
         robot.getArmAssembly().stopGrabberExtension();
 
         robot.getArmAssembly().flipUp();
-        sleep(500);
+        sleep(1500);
     }
 
 
@@ -309,7 +309,7 @@ public class Depot2 extends LinearOpMode
             distance = robot.getNavigation().getLaserDistance();
         }
 
-        double distanceToDrive = distance - 24;
+        double distanceToDrive = distance - 20;
 
         if(Math.abs(distanceToDrive) > 5)
         {
