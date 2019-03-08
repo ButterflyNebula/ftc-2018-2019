@@ -47,7 +47,7 @@ public class CraterStateChamp extends LinearOpMode
     //Motion Variables
     int goldLoc = 0;
     double forwardDistance = 14;
-    double hitGoldDistance = 11;
+    double hitGoldDistance = 12;
     double distanceToWall = 40;
     double distanceToDepot = 42;
     double distanceToCrater = -72;
@@ -117,7 +117,7 @@ public class CraterStateChamp extends LinearOpMode
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         robot.getChassisAssembly().changeToEncoderMode();
 
-         //   releaseRobot();
+        releaseRobot();
         do
         {
             if(angles !=null) //completed integration - angles updated
@@ -129,7 +129,7 @@ public class CraterStateChamp extends LinearOpMode
             }
             else  //initialPos remains as 0
             {
-                sleep(50);
+                sleep(20);
             }
         }while (runtime.seconds() < 2);  // wait until imu completes AccelerationIntegration
         Log.d("CraterStateChamp", "initialPos" + initialPos);
@@ -266,7 +266,7 @@ public class CraterStateChamp extends LinearOpMode
                     telemetry.addData("Moving forward" , "");
                     telemetry.update();
                     //Move to Position 1
-                    encoderDrive(WHEEL_SPEED , 14 , 5);
+                    encoderDrive(WHEEL_SPEED , 15 , 5);
                     goldLoc = 1;
                 }
                 else if(goldLoc == 1)
@@ -275,7 +275,7 @@ public class CraterStateChamp extends LinearOpMode
                     telemetry.addData("Gold Loc: " , goldLoc);
                     telemetry.addData("Moving backwards" , "");
                     telemetry.update();
-                    encoderDrive(WHEEL_SPEED , -28 , 5);
+                    encoderDrive(WHEEL_SPEED , -30 , 5);
                     goldLoc = -1;
                 }
                 else
