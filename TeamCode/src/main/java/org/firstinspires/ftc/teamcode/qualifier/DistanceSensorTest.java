@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="DistanceSensor", group ="Tests")
-@Disabled
 public class DistanceSensorTest extends LinearOpMode
 {
 
@@ -36,7 +35,7 @@ public class DistanceSensorTest extends LinearOpMode
             double backDepotDistance = robot.getChassisAssembly().robotHardware.backDepotDistanceSensor.getDistance(DistanceUnit.INCH);
 
             telemetry.addData("Front Depot Distance:", frontDepotDistance);
-            telemetry.addData("Back Depot Distance" , frontDepotDistance);
+            telemetry.addData("Back Depot Distance" , backDepotDistance);
 
 
             double differenceInDepotDistance = frontDepotDistance - backDepotDistance;
@@ -44,12 +43,17 @@ public class DistanceSensorTest extends LinearOpMode
             double angleDepot = Math.atan(differenceInDepotDistance/distanceBetweenSensors);
             angleDepot = Math.toDegrees(angleDepot);
 
-            double distance = robot.getChassisAssembly().robotHardware.laserDistanceSensor.getDistance(DistanceUnit.INCH);
+            double frontDistance = robot.getChassisAssembly().robotHardware.frontLaserDistanceSensor.getDistance(DistanceUnit.INCH);
 
 
             telemetry.addData("Angle (depot) " , angleDepot);
 
-            telemetry.addData("Distance", distance);
+            telemetry.addData(" Front Distance", frontDistance);
+
+
+            double backDistance = robot.getChassisAssembly().robotHardware.backLaserDistanceSensor.getDistance(DistanceUnit.INCH);
+
+            telemetry.addData("Back Distance", backDistance);
 
 
             //Crater

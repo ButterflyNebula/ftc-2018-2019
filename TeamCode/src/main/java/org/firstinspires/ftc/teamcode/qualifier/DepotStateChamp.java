@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.qualifier;
 
 
-import android.util.Log;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
@@ -47,7 +46,7 @@ public class DepotStateChamp extends LinearOpMode
     //Motion Variables
     int goldLoc = 0;
     double forwardDistance = 28;
-    double hitGoldDistance = 12;
+    double hitGoldDistance = 38;
     double distanceToCrater = -72;
     double robotAngle = 0;
 
@@ -108,7 +107,14 @@ public class DepotStateChamp extends LinearOpMode
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         robot.getChassisAssembly().changeToEncoderMode();
 
+
+        /**
+         * START
+         */
+
         releaseRobot();
+
+        //Getting the current Orientation using IMU
         do
         {
             if(angles !=null) //completed integration - angles updated
@@ -123,16 +129,17 @@ public class DepotStateChamp extends LinearOpMode
                 sleep(20);
             }
         }while (runtime.seconds() < 2);  // wait until imu completes AccelerationIntegration
-        Log.d("DepotStateChamp", "initialPos" + initialPos);
 
         moveFromLander();
-        sidewaysAlign();
+
+        imuCorrection();
+
         hitGold();
-        sidewaysAlign();
+
+        imuCorrection();
 
 
-        sleep (10000);
-        //placeMarker();
+        placeMarker();
 
 
         detector.disable();
@@ -149,17 +156,17 @@ public class DepotStateChamp extends LinearOpMode
         while (robot.getLiftAssembly().robotHardware.topTouch.getState() == true)
         {
             robot.getLiftAssembly().liftUpRobot(0.5);
-            telemetry.addData("in  while loop", "still going on");
-            telemetry.update();
+            //telemetry.addData("in  while loop", "still going on");
+            //telemetry.update();
         }
         robot.getLiftAssembly().resetLift();
-        telemetry.addData("outside while loop: ", "reached the top");
-        telemetry.update();
+        //telemetry.addData("outside while loop: ", "reached the top");
+        //telemetry.update();
 
         runtime.reset();
         encoderDrive(1 , -5, 4);
-        telemetry.addData("in stop moving","stopped");
-        telemetry.update();
+        //telemetry.addData("in stop moving","stopped");
+        //telemetry.update();
 
     }
 
@@ -169,48 +176,48 @@ public class DepotStateChamp extends LinearOpMode
     private void moveFromLander()
     {
         encoderSide(WHEEL_SPEED , 15 , "LEFT" , 6);
-        encoderDrive(WHEEL_SPEED , 6 , 5);
+        encoderDrive(WHEEL_SPEED , 5 , 5);
 
     }//end of moveFromLander
 
 
     /**
-     * Sideways align
+     * IMU CORRECTION
      */
-    private void sidewaysAlign()
+    private void imuCorrection()
     {
         try
         {
             double newPos =  angles.firstAngle;
-            telemetry.addData("newPos = " ,  newPos);
-            telemetry.update();
-            Log.d("DepotStateChamp", "newPos = " +  newPos);
+            // telemetry.addData("newPos = " ,  newPos);
+            // telemetry.update();
+
 
             double angleDiff =  newStartPos- newPos;
-            telemetry.addData("angleDiff = " ,  angleDiff);
-            telemetry.update();
-            Log.d("DepotStateChamp", "angleDiff = " +  angleDiff);
+            // telemetry.addData("angleDiff = " ,  angleDiff);
+            // telemetry.update();
+
             if(angleDiff > 0){
-                telemetry.addData("turning right = " ,  "");
-                telemetry.update();
+                // telemetry.addData("turning right = " ,  "");
+                //  telemetry.update();
                 encoderTurn(SIDE_WHEEL_SPEED,abs(angleDiff), "LEFT",5);
             }
             else if( angleDiff < 0)
             {
-                telemetry.addData("turning left = " ,  "");
-                telemetry.update();
+                //  telemetry.addData("turning left = " ,  "");
+                //  telemetry.update();
                 encoderTurn(SIDE_WHEEL_SPEED,abs(angleDiff), "RIGHT",5);
             }
             newStartPos =  angles.firstAngle;
-            telemetry.addData("newStartPos = " ,  newStartPos);
-            telemetry.update();
-            Log.d("DepotStateChamp", "newStartPos = " +  newStartPos);
+            //telemetry.addData("newStartPos = " ,  newStartPos);
+            // telemetry.update();
+
         }
         catch (Exception ex)
         {
             telemetry.addData("imu not available for sideways correction " ,  "");
             telemetry.update();
-            Log.e("DepotStateChamp", "imu not available for sideways correction ");
+
         }
 
 
@@ -222,9 +229,6 @@ public class DepotStateChamp extends LinearOpMode
      */
     private void hitGold()
     {
-        double leftAngle = 55;
-        double rightAngle = 110;
-
         boolean goldFound = false;
 
         while(goldFound == false)
@@ -245,12 +249,12 @@ public class DepotStateChamp extends LinearOpMode
                 telemetry.addData("Gold Loc: " , goldLoc);
                 telemetry.addData("Moving sideways to hit gold" , "");
                 telemetry.update();
-                Log.d("DepotStateChamp", "goldFound = true");
+
                 encoderSide(SIDE_WHEEL_SPEED , hitGoldDistance , "LEFT" , 6);
             }
             else
             {
-                Log.d("DepotStateChamp", "Gold Loc entering else:" + goldLoc);
+
                 if(goldLoc == 0)
                 {
                     telemetry.addData("Gold Loc: " , goldLoc);
@@ -259,6 +263,7 @@ public class DepotStateChamp extends LinearOpMode
                     //Move to Position 1
                     encoderDrive(WHEEL_SPEED , 15 , 5);
                     goldLoc = 1;
+                    hitGoldDistance = 26;
                 }
                 else if(goldLoc == 1)
                 {
@@ -276,13 +281,13 @@ public class DepotStateChamp extends LinearOpMode
                     telemetry.addData("Couldn't find Gold - Defaulting Value to True " , goldLoc);
                     telemetry.update();
                 }
-                Log.d("DepotStateChamp", "Gold Loc exiting else:" + goldLoc);
+
             }
 
         }
         runtime.reset();
-        encoderSide(SIDE_WHEEL_SPEED , hitGoldDistance  , "RIGHT" , 6);
 
+        encoderSide(SIDE_WHEEL_SPEED, 5, "RIGHT", 5);
 
     }//end of hitGold
 
@@ -292,17 +297,26 @@ public class DepotStateChamp extends LinearOpMode
      */
     private void placeMarker()
     {
-        double angleToTurn = 45 + robotAngle;
 
-        encoderTurn(WHEEL_SPEED, angleToTurn, "RIGHT", 5);
+        encoderTurn(WHEEL_SPEED, 45, "LEFT", 5);
 
-        wallAlign();
+        if(goldLoc == 1)
+        {
+            encoderSide(SIDE_WHEEL_SPEED, 20, "LEFT", 7);
+        }
 
-        laserDistance();
+        boolean isAligned = wallAlign();
+        if(isAligned)
+        {
 
-      //  releaseMarker();
 
-        encoderDrive(WHEEL_SPEED, distanceToCrater, 8);
+            laserDistance();
+
+            releaseMarker();
+
+            encoderDrive(WHEEL_SPEED, distanceToCrater, 8);
+        }
+
 
     }//end of place marker
 
@@ -318,67 +332,117 @@ public class DepotStateChamp extends LinearOpMode
         }
         robot.getArmAssembly().stopGrabberExtension();
 
-        robot.getArmAssembly().flipUp();
-        sleep(1500);
+        runtime.reset();
+        while(opModeIsActive() && robot.getArmAssembly().robotHardware.flipper.getPosition() != robot.getArmAssembly().upPosition)
+        {
+            robot.getArmAssembly().flipUp();
+        }
+        sleep(750);
     }
 
 
     /**
      * WALL ALIGN METHOD
      */
-    private void wallAlign()
+    private boolean  wallAlign()
     {
-        double angle = 5;
-
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.5)
+        try
         {
-            angle = robot.getNavigation().getDepotAngle();
-        }
+            double angle = 5;
 
-        if(Math.abs(angle) > 5)
-        {
-            encoderTurn(WHEEL_SPEED, angle, "LEFT", 5);
-        }
-
-        double distance = 10;
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.5)
-        {
-            distance = robot.getNavigation().getDepotDistance();
-
-        }
-
-        telemetry.addData("Distance", distance);
-        telemetry.update();
-
-        if(distance > 5)
-        {
-            double distanceToDrive = distance - 2;
-
-            if(distanceToDrive > 2)
+            for(int i = 0; i < 2; i++)
             {
+                runtime.reset();
+                while (opModeIsActive() && runtime.seconds() < 0.5)
+                {
+                    angle = robot.getNavigation().getDepotAngle();
+                }
+
+                if(angle > 20)
+                {
+                    telemetry.addData("Angle too large.. recalculating", angle);
+                    telemetry.update();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            try
+            {
+                if (Math.abs(angle) > 20)
+                    return false;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+
+            if(Math.abs(angle) > 5)
+            {
+                encoderTurn(WHEEL_SPEED, angle, "LEFT", 5);
+            }
+
+            double distance = 10;
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 0.5)
+            {
+                distance = robot.getNavigation().getDepotDistance();
+
+            }
+
+            telemetry.addData("Distance", distance);
+            telemetry.update();
+
+            if(distance > 3)
+            {
+                double distanceToDrive = distance - 3;
+
                 encoderSide(WHEEL_SPEED , distanceToDrive , "LEFT" , 5);
+
+            }
+
+            //Double Check the angle
+            for(int i = 0; i < 2; i++)
+            {
+                runtime.reset();
+                while (opModeIsActive() && runtime.seconds() < 0.5)
+                {
+                    angle = robot.getNavigation().getDepotAngle();
+                }
+
+                if(angle > 20)
+                {
+                    telemetry.addData("Angle too large.. recalculating", angle);
+                    telemetry.update();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            try
+            {
+                if (Math.abs(angle) > 20)
+                    return false;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            if(Math.abs(angle) > 3)
+            {
+                encoderTurn(WHEEL_SPEED, angle, "LEFT", 5);
             }
         }
-
-        //Double Check the angle
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.5)
+        catch ( Exception e)
         {
-            angle = robot.getNavigation().getDepotAngle();
+            return false;
         }
+        return true;
 
-
-        if(Math.abs(angle) > 3)
-        {
-            encoderTurn(WHEEL_SPEED, angle, "LEFT", 5);
-        }
-
-        if(goldLoc == 1)
-        {
-            encoderSide(WHEEL_SPEED, 4, "RIGHT", 5);
-        }
     }
 
     /**
@@ -391,7 +455,7 @@ public class DepotStateChamp extends LinearOpMode
         runtime.reset();
         while(opModeIsActive() && runtime.seconds() < 0.5)
         {
-            distance = robot.getNavigation().getLaserDistance();
+            distance = robot.getNavigation().getFrontLaserDistance();
         }
 
         double distanceToDrive = distance - 20;

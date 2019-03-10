@@ -83,9 +83,14 @@ public class Navigation
         return 0.5 * (frontDistance + backDistance);
     }
 
-    protected double getLaserDistance()
+    protected double getFrontLaserDistance()
     {
-        return robotHardware.laserDistanceSensor.getDistance(DistanceUnit.INCH);
+        return robotHardware.frontLaserDistanceSensor.getDistance(DistanceUnit.INCH);
+    }
+
+    protected double getBackLaserDistance()
+    {
+        return robotHardware.backLaserDistanceSensor.getDistance(DistanceUnit.INCH);
     }
 
 }

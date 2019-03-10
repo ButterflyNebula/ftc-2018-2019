@@ -10,8 +10,12 @@ import org.firstinspires.ftc.teamcode.qualifier.RobotHardware;
 
 public class ArmAssembly
 {
-    double upPosition = 0.0;
-    double downPosition = 0.5;
+    double upPosition = 0.8;
+    double downPosition = 0.12;
+    double midPosition = 0.5;
+
+    //double upPosition = 0.0; //TOWERPRO
+   // double downPosition = 0.5; //TOWERPRO
 
     RobotHardware robotHardware;
 
@@ -77,6 +81,8 @@ public class ArmAssembly
     protected void flipUp () { robotHardware.flipper.setPosition(upPosition); }
 
     protected void flipDown () { robotHardware.flipper.setPosition(downPosition); }
+
+    protected void flipMid () {robotHardware.flipper.setPosition(midPosition);};
 
     protected void flip(double position){robotHardware.flipper.setPosition(position);}
 

@@ -170,14 +170,13 @@ public class TeleOpMode extends LinearOpMode {
             //Retracting the Deposit (Automatically)
             if(depositReturn)
             {
-                while(opModeIsActive() && roverRuckusBot.getArmAssembly().robotHardware.flipper.getPosition() != roverRuckusBot.getArmAssembly().downPosition)
+                while(opModeIsActive() && roverRuckusBot.getArmAssembly().robotHardware.flipper.getPosition() != roverRuckusBot.getArmAssembly().midPosition)
                 {
-                    roverRuckusBot.getArmAssembly().flipDown();
+                    roverRuckusBot.getArmAssembly().flipMid();
                 }
-                flipPos = 0.09;
 
                 runtime.reset();
-                while(opModeIsActive() && runtime.seconds() < 0.5)
+                while(opModeIsActive() && runtime.seconds() < 0.75)
                 {
                     roverRuckusBot.getArmAssembly().extendGrabber(0.8);
                 }
@@ -190,6 +189,11 @@ public class TeleOpMode extends LinearOpMode {
                     roverRuckusBot.getArmAssembly().retractDeposit(1);
                 }
                 roverRuckusBot.getArmAssembly().stopDepositExtension();
+
+                while(opModeIsActive() && roverRuckusBot.getArmAssembly().robotHardware.flipper.getPosition() != roverRuckusBot.getArmAssembly().downPosition)
+                {
+                    roverRuckusBot.getArmAssembly().flipDown();
+                }
             }
 
 
@@ -202,11 +206,10 @@ public class TeleOpMode extends LinearOpMode {
 
             if(manualFlip > 0)
             {
-                flipPos = flipPos + 0.01;
-                roverRuckusBot.getArmAssembly().flipUp();
+                roverRuckusBot.getArmAssembly().flip(roverRuckusBot.getArmAssembly().upPosition + 0.1);
             }
 
-
+/*
             //Wrist Controls
             if(wristDown)
             {
@@ -268,7 +271,7 @@ public class TeleOpMode extends LinearOpMode {
             }
 
 
-
+*/
 
             if(wristReturn)
             {
@@ -454,7 +457,7 @@ public class TeleOpMode extends LinearOpMode {
 
 
             //Controlling the Wrist Manually
-            if(manualWristDown > 0 && roverRuckusBot.getArmAssembly().robotHardware.wristTouchDown.getState())
+            if(manualWristDown > 0)
             {
                 roverRuckusBot.getArmAssembly().moveWrist(-0.8);
             }

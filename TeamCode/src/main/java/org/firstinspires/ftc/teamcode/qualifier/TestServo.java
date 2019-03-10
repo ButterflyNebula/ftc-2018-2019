@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "testservo", group = "Tests")
-@Disabled
 public class TestServo extends LinearOpMode
 {
 
@@ -39,23 +38,23 @@ public class TestServo extends LinearOpMode
 
             if(ten)
             {
-                roverRuckusBot.getArmAssembly().flip(0.5);
+                roverRuckusBot.getArmAssembly().flip(0.1);
             }
             else if(twenty)
             {
-                roverRuckusBot.getArmAssembly().flip(0.95);
+                roverRuckusBot.getArmAssembly().flip(0.5);
             }
             else if(thirty)
             {
-                roverRuckusBot.getArmAssembly().flip(0.0);
+                roverRuckusBot.getArmAssembly().flip(0.6);
             }
             else if(forty)
             {
-                roverRuckusBot.getArmAssembly().flip(0.97);
+                roverRuckusBot.getArmAssembly().flip(0.7);
             }
             else if(fifty)
             {
-                roverRuckusBot.getArmAssembly().flip(1);
+                roverRuckusBot.getArmAssembly().flip(0.8);
             }
         }
     }

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.qualifier;
 
-import android.util.Log;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
@@ -46,12 +45,12 @@ public class CraterStateChamp extends LinearOpMode
 
     //Motion Variables
     int goldLoc = 0;
-    double forwardDistance = 14;
+
     double hitGoldDistance = 12;
-    double distanceToWall = 40;
-    double distanceToDepot = 42;
-    double distanceToCrater = -72;
-    double robotAngle = 0;
+    double distanceToWall = -40;
+    double distanceToDepot = -42;
+    double distanceToCrater = 72;
+
 
     //heading angle tracking values
     double initialPos = 0;
@@ -108,7 +107,6 @@ public class CraterStateChamp extends LinearOpMode
             telemetry.addData("status" , "waiting for start command...");
             telemetry.update();
         }
-        //waitForStart();
 
         // Set up our telemetry dashboard
         composeTelemetry();
@@ -117,14 +115,20 @@ public class CraterStateChamp extends LinearOpMode
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         robot.getChassisAssembly().changeToEncoderMode();
 
+
+        /**
+         * START
+         */
         releaseRobot();
+
+        //Getting the Current Orientation from the IMU
         do
         {
             if(angles !=null) //completed integration - angles updated
             {
                 initialPos = angles.firstAngle;
-                telemetry.addData("initialPos = " ,  initialPos);
-                telemetry.update();
+                //telemetry.addData("initialPos = " ,  initialPos);
+                //telemetry.update();
                 break;
             }
             else  //initialPos remains as 0
@@ -132,17 +136,16 @@ public class CraterStateChamp extends LinearOpMode
                 sleep(20);
             }
         }while (runtime.seconds() < 2);  // wait until imu completes AccelerationIntegration
-        Log.d("CraterStateChamp", "initialPos" + initialPos);
 
         moveFromLander();
-        sidewaysAlign();
+
+        imuCorrection();
+
         hitGold();
-        sidewaysAlign();
 
+        imuCorrection();
 
-        sleep (10000);
-
-    //    placeMarker();
+        placeMarker();
 
 
         detector.disable();
@@ -159,17 +162,17 @@ public class CraterStateChamp extends LinearOpMode
         while (robot.getLiftAssembly().robotHardware.topTouch.getState() == true)
         {
             robot.getLiftAssembly().liftUpRobot(0.5);
-            telemetry.addData("in  while loop", "still going on");
-            telemetry.update();
+            //telemetry.addData("in  while loop", "still going on");
+            //telemetry.update();
         }
         robot.getLiftAssembly().resetLift();
-        telemetry.addData("outside while loop: ", "reached the top");
-        telemetry.update();
+        //telemetry.addData("outside while loop: ", "reached the top");
+        //telemetry.update();
 
         runtime.reset();
         encoderDrive(1 , -5, 4);
-        telemetry.addData("in stop moving","stopped");
-        telemetry.update();
+        //telemetry.addData("in stop moving","stopped");
+        //telemetry.update();
 
     }
 
@@ -184,42 +187,42 @@ public class CraterStateChamp extends LinearOpMode
     }//end of moveFromLander
 
     /**
-     * Sideways align
+     * IMU Correction
      */
-    private void sidewaysAlign()
+    private void imuCorrection()
     {
         try
         {
             double newPos =  angles.firstAngle;
-            telemetry.addData("newPos = " ,  newPos);
-            telemetry.update();
-            Log.d("CraterStateChamp", "newPos = " +  newPos);
+            //telemetry.addData("newPos = " ,  newPos);
+            //telemetry.update();
+
 
             double angleDiff =  newStartPos- newPos;
-            telemetry.addData("angleDiff = " ,  angleDiff);
-            telemetry.update();
-            Log.d("CraterStateChamp", "angleDiff = " +  angleDiff);
+            //telemetry.addData("angleDiff = " ,  angleDiff);
+            //telemetry.update();
+
             if(angleDiff > 0){
-                telemetry.addData("turning right = " ,  "");
-                telemetry.update();
+                //telemetry.addData("turning right = " ,  "");
+                //telemetry.update();
                 encoderTurn(SIDE_WHEEL_SPEED,abs(angleDiff), "LEFT",5);
             }
             else if( angleDiff < 0)
             {
-                telemetry.addData("turning left = " ,  "");
-                telemetry.update();
+                //telemetry.addData("turning left = " ,  "");
+                //telemetry.update();
                 encoderTurn(SIDE_WHEEL_SPEED,abs(angleDiff), "RIGHT",5);
             }
             newStartPos =  angles.firstAngle;
-            telemetry.addData("newStartPos = " ,  newStartPos);
-            telemetry.update();
-            Log.d("CraterStateChamp", "newStartPos = " +  newStartPos);
+            //telemetry.addData("newStartPos = " ,  newStartPos);
+            //telemetry.update();
+
         }
         catch (Exception ex)
         {
             telemetry.addData("imu not available for sideways correction " ,  "");
             telemetry.update();
-            Log.e("CraterStateChamp", "imu not available for sideways correction ");
+
         }
 
 
@@ -231,8 +234,6 @@ public class CraterStateChamp extends LinearOpMode
      */
     private void hitGold()
     {
-        double leftAngle = 55;
-        double rightAngle = 110;
 
         boolean goldFound = false;
 
@@ -254,12 +255,12 @@ public class CraterStateChamp extends LinearOpMode
                 telemetry.addData("Gold Loc: " , goldLoc);
                 telemetry.addData("Moving sideways to hit gold" , "");
                 telemetry.update();
-                Log.d("CraterStateChamp", "goldFound = true");
+
                 encoderSide(SIDE_WHEEL_SPEED , hitGoldDistance , "LEFT" , 6);
             }
             else
             {
-                Log.d("CraterStateChamp", "Gold Loc entering else:" + goldLoc);
+
                 if(goldLoc == 0)
                 {
                     telemetry.addData("Gold Loc: " , goldLoc);
@@ -285,7 +286,7 @@ public class CraterStateChamp extends LinearOpMode
                     telemetry.addData("Couldn't find Gold - Defaulting Value to True " , goldLoc);
                     telemetry.update();
                 }
-                Log.d("CraterStateChamp", "Gold Loc exiting else:" + goldLoc);
+
             }
 
         }
@@ -301,23 +302,31 @@ public class CraterStateChamp extends LinearOpMode
     private void placeMarker()
     {
 
-        double angleToTurn = 80 - robotAngle;
-
-        encoderTurn(WHEEL_SPEED, angleToTurn, "LEFT", 8);
+        if(goldLoc == 1)
+        {
+            distanceToWall = distanceToWall - 15;
+        }
+        else if(goldLoc == -1)
+        {
+            distanceToWall = distanceToWall + 15;
+        }
 
         encoderDrive(WHEEL_SPEED , distanceToWall , 7);
 
         encoderTurn(WHEEL_SPEED , 45 , "LEFT", 6);
 
-        wallAlign();
+        boolean isAligned = wallAlign();
+        if(isAligned)
+        {
 
-        encoderDrive(WHEEL_SPEED, distanceToDepot, 8);
+            encoderDrive(WHEEL_SPEED, distanceToDepot, 8);
 
-        laserDistance();
+            laserDistance();
 
-      //  releaseMarker();
+            releaseMarker();
 
-        encoderDrive(WHEEL_SPEED, distanceToCrater, 10);
+            encoderDrive(WHEEL_SPEED, distanceToCrater, 10);
+        }
 
 
 
@@ -331,63 +340,124 @@ public class CraterStateChamp extends LinearOpMode
         runtime.reset();
         while (opModeIsActive() && runtime.seconds() < 0.75)
         {
-            robot.getArmAssembly().extendGrabber(0.8);
+            robot.getArmAssembly().moveWrist(-0.8);
         }
-        robot.getArmAssembly().stopGrabberExtension();
+        robot.getArmAssembly().moveWrist(0);
 
-        robot.getArmAssembly().flipUp();
-        sleep(1000);
+        runtime.reset();
+        while(opModeIsActive() && runtime.seconds() < 1)
+        {
+            robot.getArmAssembly().outTakeMineral(1);
+        }
+        robot.getArmAssembly().stopIntake();
+
+        runtime.reset();
+        while (opModeIsActive() && robot.getArmAssembly().robotHardware.wristTouch.getState())
+        {
+            robot.getArmAssembly().moveWrist(0.8);
+        }
+        robot.getArmAssembly().moveWrist(0);
+
     }
 
-    private void wallAlign()
+    private boolean wallAlign()
     {
-        double angle = -10;
-
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.5)
+        try
         {
-            angle = robot.getNavigation().getCraterAngle();
-        }
+            double angle = 5;
 
-        if(abs(angle) > 5)
-        {
-            encoderTurn(WHEEL_SPEED, angle, "RIGHT", 5);
-        }
-
-        double distance = 10;
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.5)
-        {
-            distance = robot.getNavigation().getCraterDistance();
-
-        }
-
-        telemetry.addData("Distance", distance);
-        telemetry.update();
-
-        if(distance > 5)
-        {
-            double distanceToDrive = distance - 5;
-
-            if(distanceToDrive > 2)
+            for(int i = 0; i < 2; i++)
             {
-                encoderSide(WHEEL_SPEED , distanceToDrive , "RIGHT" , 5);
+                runtime.reset();
+                while (opModeIsActive() && runtime.seconds() < 0.5)
+                {
+                    angle = robot.getNavigation().getDepotAngle();
+                }
+
+                if(angle > 20)
+                {
+                    telemetry.addData("Angle too large.. recalculating", angle);
+                    telemetry.update();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            try
+            {
+                if (Math.abs(angle) > 20)
+                    return false;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+
+            if(Math.abs(angle) > 5)
+            {
+                encoderTurn(WHEEL_SPEED, angle, "LEFT", 5);
+            }
+
+            double distance = 10;
+            runtime.reset();
+            while (opModeIsActive() && runtime.seconds() < 0.5)
+            {
+                distance = robot.getNavigation().getDepotDistance();
+
+            }
+
+            telemetry.addData("Distance", distance);
+            telemetry.update();
+
+            if(distance > 3)
+            {
+                double distanceToDrive = distance - 3;
+
+                encoderSide(WHEEL_SPEED , distanceToDrive , "LEFT" , 5);
+
+            }
+
+            //Double Check the angle
+            for(int i = 0; i < 2; i++)
+            {
+                runtime.reset();
+                while (opModeIsActive() && runtime.seconds() < 0.5)
+                {
+                    angle = robot.getNavigation().getDepotAngle();
+                }
+
+                if(angle > 20)
+                {
+                    telemetry.addData("Angle too large.. recalculating", angle);
+                    telemetry.update();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            try
+            {
+                if (Math.abs(angle) > 20)
+                    return false;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            if(Math.abs(angle) > 3)
+            {
+                encoderTurn(WHEEL_SPEED, angle, "LEFT", 5);
             }
         }
-
-        //Double Check the angle
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 0.5)
+        catch ( Exception e)
         {
-            angle = robot.getNavigation().getCraterAngle();
+            return false;
         }
-
-
-        if(abs(angle) > 3)
-        {
-            encoderTurn(WHEEL_SPEED, angle, "RIGHT", 5);
-        }
-
+        return true;
 
     }//end of Wall Align
 
@@ -401,14 +471,14 @@ public class CraterStateChamp extends LinearOpMode
         runtime.reset();
         while(opModeIsActive() && runtime.seconds() < 0.5)
         {
-            distance = robot.getNavigation().getLaserDistance();
+            distance = robot.getNavigation().getBackLaserDistance();
         }
 
         double distanceToDrive = distance - 20;
 
         if(abs(distanceToDrive) > 5)
         {
-            encoderDrive(WHEEL_SPEED, distanceToDrive, 8);
+            encoderDrive(WHEEL_SPEED, -abs(distanceToDrive), 8);
         }
     }
 
@@ -499,7 +569,7 @@ public class CraterStateChamp extends LinearOpMode
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
-           // robot.getChassisAssembly().changeToEncoderMode();
+            // robot.getChassisAssembly().changeToEncoderMode();
 
             // Determine new target position, and pass to motor controller
             if(direction.equalsIgnoreCase( "LEFT"))
@@ -577,7 +647,7 @@ public class CraterStateChamp extends LinearOpMode
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
-           // robot.getChassisAssembly().changeToEncoderMode();
+            // robot.getChassisAssembly().changeToEncoderMode();
             // Determine new target position, and pass to motor controller
             if(direction.equalsIgnoreCase( "RIGHT"))
             {

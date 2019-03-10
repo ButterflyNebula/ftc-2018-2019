@@ -317,7 +317,7 @@ public class Crater2 extends LinearOpMode
         runtime.reset();
         while(opModeIsActive() && runtime.seconds() < 0.5)
         {
-            distance = robot.getNavigation().getLaserDistance();
+            distance = robot.getNavigation().getFrontLaserDistance();
         }
 
         double distanceToDrive = distance - 20;

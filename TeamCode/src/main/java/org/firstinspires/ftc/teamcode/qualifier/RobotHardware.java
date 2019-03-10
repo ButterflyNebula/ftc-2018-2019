@@ -41,7 +41,6 @@ public class RobotHardware
     public DigitalChannel wristTouch = null;
     public DigitalChannel backTouch = null;
     public DigitalChannel deliveryTouch = null;
-    public DigitalChannel wristTouchDown = null;
 
     //Distance Sensors
     public ModernRoboticsI2cRangeSensor frontCraterDistanceSensor = null;
@@ -49,7 +48,8 @@ public class RobotHardware
     public ModernRoboticsI2cRangeSensor frontDepotDistanceSensor = null;
     public ModernRoboticsI2cRangeSensor backDepotDistanceSensor = null;
 
-    public Rev2mDistanceSensor laserDistanceSensor = null;
+    public Rev2mDistanceSensor frontLaserDistanceSensor = null;
+    public Rev2mDistanceSensor backLaserDistanceSensor = null;
     // The IMU sensor object
     public BNO055IMU imu = null;
 
@@ -100,7 +100,6 @@ public class RobotHardware
         wristTouch = hwMap.get(DigitalChannel.class, "wristTouch");
         backTouch = hwMap.get(DigitalChannel.class, "backTouch");
         deliveryTouch = hwMap.get(DigitalChannel.class, "deliveryTouch");
-        wristTouchDown = hwMap.get(DigitalChannel.class , "touchDown");
 
 
         //Distance Sensors
@@ -110,7 +109,9 @@ public class RobotHardware
         frontDepotDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "frontDepotDistanceSensor");
         backDepotDistanceSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "backDepotDistanceSensor");
 
-        laserDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "laserDistanceSensor");
+        frontLaserDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "frontLaserDistanceSensor");
+        backLaserDistanceSensor = hwMap.get(Rev2mDistanceSensor.class, "backLaserDistanceSensor");
+
 
         // Set up the parameters with which we will use our IMU. Note that integration
         // algorithm here just reports accelerations to the logcat log; it doesn't actually
