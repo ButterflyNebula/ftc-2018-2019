@@ -281,7 +281,7 @@ public class TeleOpMode extends LinearOpMode {
                 runtime.reset();
 
                 //Move the Wrist Up
-                while(opModeIsActive() && runtime.seconds() < 1.2 && !terminate)
+                while(opModeIsActive() && runtime.seconds() < 0.8 && !terminate)
                 {
                     terminate = gamepad1.y;
 

@@ -350,7 +350,7 @@ public class DepotStateChamp extends LinearOpMode
         {
             double angle = 5;
 
-            for(int i = 0; i < 2; i++)
+            for(int i = 0; i < 9; i++)
             {
                 runtime.reset();
                 while (opModeIsActive() && runtime.seconds() < 0.5)
@@ -404,7 +404,7 @@ public class DepotStateChamp extends LinearOpMode
             }
 
             //Double Check the angle
-            for(int i = 0; i < 2; i++)
+            for(int i = 0; i < 5; i++)
             {
                 runtime.reset();
                 while (opModeIsActive() && runtime.seconds() < 0.5)
